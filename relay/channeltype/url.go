@@ -47,6 +47,7 @@ var ChannelBaseURLs = []string{
 	"",                                          // 43
 	"https://api.siliconflow.cn",                // 44
 	"https://api.imaginepro.ai",                 // 45
+	"https://chat.sankuai.com",                  // 46
 }
 
 func init() {
