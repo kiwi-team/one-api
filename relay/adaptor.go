@@ -7,12 +7,14 @@ import (
 	"github.com/songquanpeng/one-api/relay/adaptor/anthropic"
 	"github.com/songquanpeng/one-api/relay/adaptor/aws"
 	"github.com/songquanpeng/one-api/relay/adaptor/baidu"
+	"github.com/songquanpeng/one-api/relay/adaptor/bfl"
 	"github.com/songquanpeng/one-api/relay/adaptor/cloudflare"
 	"github.com/songquanpeng/one-api/relay/adaptor/cohere"
 	"github.com/songquanpeng/one-api/relay/adaptor/coze"
 	"github.com/songquanpeng/one-api/relay/adaptor/deepl"
 	"github.com/songquanpeng/one-api/relay/adaptor/gemini"
 	"github.com/songquanpeng/one-api/relay/adaptor/imaginepro"
+	"github.com/songquanpeng/one-api/relay/adaptor/klingai"
 	"github.com/songquanpeng/one-api/relay/adaptor/ollama"
 	"github.com/songquanpeng/one-api/relay/adaptor/openai"
 	"github.com/songquanpeng/one-api/relay/adaptor/palm"
@@ -64,6 +66,10 @@ func GetAdaptor(apiType int) adaptor.Adaptor {
 		return &proxy.Adaptor{}
 	case apitype.ImaginePro:
 		return &imaginepro.Adaptor{}
+	case apitype.KlingAI:
+		return &klingai.Adaptor{}
+	case apitype.BFL:
+		return &bfl.Adaptor{}
 	}
 	return nil
 }
