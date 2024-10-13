@@ -48,5 +48,6 @@ const (
 	SiliconFlow
 	ImaginePro
 	Friday
+	KlingAI
 	Dummy
 )

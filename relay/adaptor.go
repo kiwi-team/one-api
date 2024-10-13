@@ -13,6 +13,7 @@ import (
 	"github.com/songquanpeng/one-api/relay/adaptor/deepl"
 	"github.com/songquanpeng/one-api/relay/adaptor/gemini"
 	"github.com/songquanpeng/one-api/relay/adaptor/imaginepro"
+	"github.com/songquanpeng/one-api/relay/adaptor/klingai"
 	"github.com/songquanpeng/one-api/relay/adaptor/ollama"
 	"github.com/songquanpeng/one-api/relay/adaptor/openai"
 	"github.com/songquanpeng/one-api/relay/adaptor/palm"
@@ -64,6 +65,8 @@ func GetAdaptor(apiType int) adaptor.Adaptor {
 		return &proxy.Adaptor{}
 	case apitype.ImaginePro:
 		return &imaginepro.Adaptor{}
+	case apitype.KlingAI:
+		return &klingai.Adaptor{}
 	}
 	return nil
 }
