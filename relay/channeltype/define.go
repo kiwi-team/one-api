@@ -49,5 +49,6 @@ const (
 	ImaginePro
 	Friday
 	KlingAI
+	BFL
 	Dummy
 )

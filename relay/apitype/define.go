@@ -21,6 +21,7 @@ const (
 	Proxy
 	ImaginePro
 	KlingAI
+	BFL
 
 	Dummy // this one is only for count, do not add any channel after this
 )

@@ -43,6 +43,8 @@ func ToAPIType(channelType int) int {
 		apiType = apitype.ImaginePro
 	case KlingAI:
 		apiType = apitype.KlingAI
+	case BFL:
+		apiType = apitype.BFL
 	}
 
 	return apiType

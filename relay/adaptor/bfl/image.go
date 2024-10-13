@@ -1,4 +1,4 @@
-package klingai
+package bfl
 
 import (
 	"encoding/json"
@@ -15,43 +15,43 @@ import (
 )
 
 func ImageHandler(c *gin.Context, resp *http.Response) (*model.ErrorWithStatusCode, *model.Usage) {
-	apiKey := c.Request.Header.Get("Authorization")
-	apiKey = apiKey[len("Bearer "):]
+	apiKey := c.Request.Header.Get("X-Key")
 
-	var klingaiTaskResponse TaskResponse
+	var bflTaskResponse TaskResponse
 	responseBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return openai.ErrorWrapper(err, "read_response_body_failed", http.StatusInternalServerError), nil
 	}
+
 	err = resp.Body.Close()
+
 	if err != nil {
 		return openai.ErrorWrapper(err, "close_response_body_failed", http.StatusInternalServerError), nil
 	}
 
-	err = json.Unmarshal(responseBody, &klingaiTaskResponse)
+	err = json.Unmarshal(responseBody, &bflTaskResponse)
 	if err != nil {
 		return openai.ErrorWrapper(err, "unmarshal_response_body_failed", http.StatusInternalServerError), nil
 	}
 
-	klingaiResponse, _, err := asyncTaskWait(klingaiTaskResponse.Data.TaskId, apiKey)
+	bflResponse, _, err := asyncTaskWait(bflTaskResponse.Id, apiKey)
 
 	if err != nil {
-		return openai.ErrorWrapper(err, "klingai_async_task_wait_failed", http.StatusInternalServerError), nil
+		return openai.ErrorWrapper(err, "bfl_async_task_wait_failed", http.StatusInternalServerError), nil
 	}
 
-	if klingaiResponse.Data.TaskStatus != "succeed" {
+	if bflResponse.Status != "Ready" {
 		return &model.ErrorWithStatusCode{
 			Error: model.Error{
-				Message: klingaiResponse.Message,
-				Type:    "klingai_error",
+				Message: bflResponse.Status,
+				Type:    "bfl_error",
 				Param:   "",
-				Code:    klingaiResponse.Code,
 			},
 			StatusCode: resp.StatusCode,
 		}, nil
 	}
 
-	fullTextResponse := responseKlingai2OpenAI(klingaiResponse)
+	fullTextResponse := responseBfl2OpenAI(bflResponse)
 	jsonResponse, err := json.Marshal(fullTextResponse)
 	if err != nil {
 		return openai.ErrorWrapper(err, "marshal_response_body_failed", http.StatusInternalServerError), nil
@@ -63,8 +63,8 @@ func ImageHandler(c *gin.Context, resp *http.Response) (*model.ErrorWithStatusCo
 	return nil, nil
 }
 
-func asyncTaskQuery(taskId, token string) (*TaskResponse, []byte, error) {
-	url := fmt.Sprintf("https://api.klingai.com/v1/images/generations/%s", taskId)
+func asyncTaskQuery(taskId, apiKey string) (*TaskResponse, []byte, error) {
+	url := fmt.Sprintf("https://api.bfl.ml/v1/get_result?id=%s", taskId)
 
 	var taskResponse TaskResponse
 
@@ -73,31 +73,32 @@ func asyncTaskQuery(taskId, token string) (*TaskResponse, []byte, error) {
 		return &taskResponse, nil, err
 	}
 
-	req.Header.Set("Authorization", "Bearer "+token)
-	client := &http.Client{}
+	req.Header.Set("X-Key", apiKey)
+	req.Header.Set("Content-Type", "application/json")
+
+	client := http.Client{}
+
 	resp, err := client.Do(req)
 	if err != nil {
-		logger.SysError("klingai AsyncTask client.Do err: " + err.Error())
 		return &taskResponse, nil, err
 	}
 
 	defer resp.Body.Close()
 
 	responseBody, err := io.ReadAll(resp.Body)
-
 	if err != nil {
-		logger.SysError("klingai AsyncTaskQuery io.ReadAll err: " + err.Error())
+		logger.SysError("bfl asyncTaskQuery io.ReadAll: " + err.Error())
 		return &taskResponse, nil, err
 	}
 
 	var response TaskResponse
 	err = json.Unmarshal(responseBody, &response)
 	if err != nil {
-		logger.SysError("klingai AsyncTask NewDecoder err: " + err.Error())
+		logger.SysError("bfl asyncTaskQuery json.Unmarshal: " + err.Error())
 		return &taskResponse, nil, err
 	}
 
-	logger.SysLog("klingai AsyncTask response: " + string(responseBody))
+	logger.SysLog("bfl asyncTaskQuery response: " + string(responseBody))
 
 	return &response, responseBody, nil
 }
@@ -110,27 +111,28 @@ func asyncTaskWait(taskId, apiKey string) (*TaskResponse, []byte, error) {
 	var taskResponse TaskResponse
 	var responseBody []byte
 
-	token, err := GetToken(apiKey)
-	if err != nil {
-		return nil, nil, err
-	}
-
 	for {
 		step++
-		rsp, body, err := asyncTaskQuery(taskId, token)
+		rsp, body, err := asyncTaskQuery(taskId, apiKey)
 		responseBody = body
 		if err != nil {
 			return &taskResponse, responseBody, err
 		}
 
-		if rsp.Data.TaskStatus == "" {
+		if rsp.Status == "" {
 			return &taskResponse, responseBody, nil
 		}
 
-		switch rsp.Data.TaskStatus {
-		case "failed":
+		switch rsp.Status {
+		case "Task not found":
 			fallthrough
-		case "succeed":
+		case "Content Moderated":
+			fallthrough
+		case "Request Moderated":
+			fallthrough
+		case "Error":
+			fallthrough
+		case "Ready":
 			return rsp, responseBody, nil
 		}
 
@@ -141,24 +143,19 @@ func asyncTaskWait(taskId, apiKey string) (*TaskResponse, []byte, error) {
 		time.Sleep(time.Duration(waitSeconds) * time.Second)
 	}
 
-	return nil, nil, fmt.Errorf("klingaiAsyncTaskWait timeout")
+	return nil, nil, fmt.Errorf("bfl asyncTaskWait timeout")
 }
 
-func responseKlingai2OpenAI(response *TaskResponse) *openai.ImageResponse {
+func responseBfl2OpenAI(bflResponse *TaskResponse) *openai.ImageResponse {
 	imageResponse := openai.ImageResponse{
 		Created: helper.GetTimestamp(),
 	}
 
-	logger.SysLog("klingai response images count: " + fmt.Sprint(len(response.Data.TaskResult.Images)))
-
-	for _, data := range response.Data.TaskResult.Images {
-		logger.SysLog("klingai response data url: " + data.Url)
-		imageResponse.Data = append(imageResponse.Data, openai.ImageData{
-			Url:           data.Url,
-			B64Json:       "",
-			RevisedPrompt: "",
-		})
-	}
+	imageResponse.Data = append(imageResponse.Data, openai.ImageData{
+		Url:           bflResponse.Result.Sample,
+		B64Json:       "",
+		RevisedPrompt: "",
+	})
 
 	return &imageResponse
 }
