@@ -14,4 +14,4 @@ rm -rf /data/www/one-api/default
 eeooff
 echo delete_old_file
 
-scp -r  ./build/default www@161.189.145.33:/data/www/one-api/
+scp -r  ./build/default www@52.83.39.13:/data/www/one-api/
