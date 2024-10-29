@@ -4,10 +4,11 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"github.com/songquanpeng/one-api/common/render"
 	"io"
 	"net/http"
 	"strings"
+
+	"github.com/songquanpeng/one-api/common/render"
 
 	"github.com/songquanpeng/one-api/common"
 	"github.com/songquanpeng/one-api/common/config"
@@ -39,15 +40,15 @@ func ConvertRequest(textRequest model.GeneralOpenAIRequest) *ChatRequest {
 			},
 			{
 				Category:  "HARM_CATEGORY_HATE_SPEECH",
-				Threshold: config.GeminiSafetySetting,
+				Threshold: "BLOCK_ONLY_HIGH",
 			},
 			{
 				Category:  "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-				Threshold: config.GeminiSafetySetting,
+				Threshold: "BLOCK_ONLY_HIGH",
 			},
 			{
 				Category:  "HARM_CATEGORY_DANGEROUS_CONTENT",
-				Threshold: config.GeminiSafetySetting,
+				Threshold: "BLOCK_ONLY_HIGH",
 			},
 		},
 		GenerationConfig: ChatGenerationConfig{
