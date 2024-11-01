@@ -34,7 +34,9 @@ var ModelRatio = map[string]float64{
 	"gpt-4-turbo":             5,     // $0.01 / 1K tokens
 	"gpt-4-turbo-2024-04-09":  5,     // $0.01 / 1K tokens
 	"gpt-4o":                  2.5,   // $0.005 / 1K tokens
+	"chatgpt-4o-latest":       2.5,   // $0.005 / 1K tokens
 	"gpt-4o-2024-05-13":       2.5,   // $0.005 / 1K tokens
+	"gpt-4o-2024-08-06":       1.25,  // $0.0025 / 1K tokens
 	"gpt-4o-mini":             0.075, // $0.00015 / 1K tokens
 	"gpt-4o-mini-2024-07-18":  0.075, // $0.00015 / 1K tokens
 	"gpt-4-vision-preview":    5,     // $0.01 / 1K tokens
@@ -79,6 +81,7 @@ var ModelRatio = map[string]float64{
 	"claude-3-haiku-20240307":    0.25 / 1000 * USD,
 	"claude-3-sonnet-20240229":   3.0 / 1000 * USD,
 	"claude-3-5-sonnet-20240620": 3.0 / 1000 * USD,
+	"claude-3-5-sonnet-20241022": 3.0 / 1000 * USD,
 	"claude-3-opus-20240229":     15.0 / 1000 * USD,
 	// https://cloud.baidu.com/doc/WENXINWORKSHOP/s/hlrk4akp7
 	"ERNIE-4.0-8K":       0.120 * RMB,
@@ -126,7 +129,9 @@ var ModelRatio = map[string]float64{
 	"SparkDesk-v1.1":            1.2858, // ￥0.018 / 1k tokens
 	"SparkDesk-v2.1":            1.2858, // ￥0.018 / 1k tokens
 	"SparkDesk-v3.1":            1.2858, // ￥0.018 / 1k tokens
+	"SparkDesk-v3.1-128K":       1.2858, // ￥0.018 / 1k tokens
 	"SparkDesk-v3.5":            1.2858, // ￥0.018 / 1k tokens
+	"SparkDesk-v3.5-32K":        1.2858, // ￥0.018 / 1k tokens
 	"SparkDesk-v4.0":            1.2858, // ￥0.018 / 1k tokens
 	"360GPT_S2_V9":              0.8572, // ¥0.012 / 1k tokens
 	"embedding-bert-512-v1":     0.0715, // ¥0.001 / 1k tokens
@@ -158,23 +163,34 @@ var ModelRatio = map[string]float64{
 	"mistral-embed":         0.1 / 1000 * USD,
 	// https://wow.groq.com/#:~:text=inquiries%C2%A0here.-,Model,-Current%20Speed
 	"gemma-7b-it":                           0.07 / 1000000 * USD,
-	"mixtral-8x7b-32768":                    0.24 / 1000000 * USD,
-	"llama3-8b-8192":                        0.05 / 1000000 * USD,
-	"llama3-70b-8192":                       0.59 / 1000000 * USD,
 	"gemma2-9b-it":                          0.20 / 1000000 * USD,
-	"llama-3.1-405b-reasoning":              0.89 / 1000000 * USD,
 	"llama-3.1-70b-versatile":               0.59 / 1000000 * USD,
 	"llama-3.1-8b-instant":                  0.05 / 1000000 * USD,
+	"llama-3.2-11b-text-preview":            0.05 / 1000000 * USD,
+	"llama-3.2-11b-vision-preview":          0.05 / 1000000 * USD,
+	"llama-3.2-1b-preview":                  0.05 / 1000000 * USD,
+	"llama-3.2-3b-preview":                  0.05 / 1000000 * USD,
+	"llama-3.2-90b-text-preview":            0.59 / 1000000 * USD,
+	"llama-guard-3-8b":                      0.05 / 1000000 * USD,
+	"llama3-70b-8192":                       0.59 / 1000000 * USD,
+	"llama3-8b-8192":                        0.05 / 1000000 * USD,
 	"llama3-groq-70b-8192-tool-use-preview": 0.89 / 1000000 * USD,
 	"llama3-groq-8b-8192-tool-use-preview":  0.19 / 1000000 * USD,
+	"mixtral-8x7b-32768":                    0.24 / 1000000 * USD,
+
 	// https://platform.lingyiwanwu.com/docs#-计费单元
 	"yi-34b-chat-0205": 2.5 / 1000 * RMB,
 	"yi-34b-chat-200k": 12.0 / 1000 * RMB,
 	"yi-vl-plus":       6.0 / 1000 * RMB,
-	// stepfun todo
-	"step-1v-32k": 0.024 * RMB,
-	"step-1-32k":  0.024 * RMB,
-	"step-1-200k": 0.15 * RMB,
+	// https://platform.stepfun.com/docs/pricing/details
+	"step-1-8k":    0.005 / 1000 * RMB,
+	"step-1-32k":   0.015 / 1000 * RMB,
+	"step-1-128k":  0.040 / 1000 * RMB,
+	"step-1-256k":  0.095 / 1000 * RMB,
+	"step-1-flash": 0.001 / 1000 * RMB,
+	"step-2-16k":   0.038 / 1000 * RMB,
+	"step-1v-8k":   0.005 / 1000 * RMB,
+	"step-1v-32k":  0.015 / 1000 * RMB,
 	// aws llama3 https://aws.amazon.com/cn/bedrock/pricing/
 	"llama3-8b-8192(33)":  0.0003 / 0.002,  // $0.0003 / 1K tokens
 	"llama3-70b-8192(33)": 0.00265 / 0.002, // $0.00265 / 1K tokens
@@ -200,8 +216,10 @@ var CompletionRatio = map[string]float64{
 	"llama3-70b-8192(33)": 0.0035 / 0.00265,
 }
 
-var DefaultModelRatio map[string]float64
-var DefaultCompletionRatio map[string]float64
+var (
+	DefaultModelRatio      map[string]float64
+	DefaultCompletionRatio map[string]float64
+)
 
 func init() {
 	DefaultModelRatio = make(map[string]float64)
@@ -313,7 +331,7 @@ func GetCompletionRatio(name string, channelType int) float64 {
 		return 4.0 / 3.0
 	}
 	if strings.HasPrefix(name, "gpt-4") {
-		if strings.HasPrefix(name, "gpt-4o-mini") {
+		if strings.HasPrefix(name, "gpt-4o-mini") || name == "gpt-4o-2024-08-06" {
 			return 4
 		}
 		if strings.HasPrefix(name, "gpt-4-turbo") ||
@@ -322,6 +340,9 @@ func GetCompletionRatio(name string, channelType int) float64 {
 			return 3
 		}
 		return 2
+	}
+	if name == "chatgpt-4o-latest" {
+		return 3
 	}
 	if strings.HasPrefix(name, "claude-3") {
 		return 5
