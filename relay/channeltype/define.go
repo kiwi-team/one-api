@@ -50,5 +50,6 @@ const (
 	Friday
 	KlingAI
 	BFL
+	Panda
 	Dummy
 )

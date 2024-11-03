@@ -12,6 +12,7 @@ import (
 	"github.com/songquanpeng/one-api/relay/adaptor/mistral"
 	"github.com/songquanpeng/one-api/relay/adaptor/moonshot"
 	"github.com/songquanpeng/one-api/relay/adaptor/novita"
+	"github.com/songquanpeng/one-api/relay/adaptor/panda"
 	"github.com/songquanpeng/one-api/relay/adaptor/siliconflow"
 	"github.com/songquanpeng/one-api/relay/adaptor/stepfun"
 	"github.com/songquanpeng/one-api/relay/adaptor/togetherai"
@@ -34,6 +35,7 @@ var CompatibleChannels = []int{
 	channeltype.Novita,
 	channeltype.SiliconFlow,
 	channeltype.Friday,
+	channeltype.Panda,
 }
 
 func GetCompatibleChannelMeta(channelType int) (string, []string) {
@@ -68,6 +70,8 @@ func GetCompatibleChannelMeta(channelType int) (string, []string) {
 		return "siliconflow", siliconflow.ModelList
 	case channeltype.Friday:
 		return "friday", friday.ModelList
+	case channeltype.Panda:
+		return "panda", panda.ModelList
 	default:
 		return "openai", ModelList
 	}

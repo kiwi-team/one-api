@@ -3,7 +3,7 @@ package gemini
 type ChatRequest struct {
 	Contents         []ChatContent        `json:"contents"`
 	SafetySettings   []ChatSafetySettings `json:"safetySettings,omitempty"`
-	GenerationConfig ChatGenerationConfig `json:"generation_config,omitempty"`
+	GenerationConfig ChatGenerationConfig `json:"generationConfig,omitempty"`
 	Tools            []ChatTools          `json:"tools,omitempty"`
 }
 
