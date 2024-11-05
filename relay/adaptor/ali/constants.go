@@ -6,3 +6,5 @@ var ModelList = []string{
 	"text-embedding-v1",
 	"ali-stable-diffusion-xl", "ali-stable-diffusion-v1.5", "wanx-v1",
 }
+
+//"qwen-vl-max",

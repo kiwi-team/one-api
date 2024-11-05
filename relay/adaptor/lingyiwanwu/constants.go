@@ -8,4 +8,5 @@ var ModelList = []string{
 	"yi-vl-plus",
 	"yi-large",
 	"yi-lightning",
+	"yi-vision",
 }
