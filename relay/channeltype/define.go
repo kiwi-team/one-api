@@ -51,5 +51,6 @@ const (
 	KlingAI
 	BFL
 	Panda
+	Newaliyun
 	Dummy
 )

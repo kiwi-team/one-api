@@ -12,6 +12,7 @@ import (
 	"github.com/songquanpeng/one-api/relay/adaptor/doubao"
 	"github.com/songquanpeng/one-api/relay/adaptor/friday"
 	"github.com/songquanpeng/one-api/relay/adaptor/minimax"
+	"github.com/songquanpeng/one-api/relay/adaptor/newaliyun"
 	"github.com/songquanpeng/one-api/relay/adaptor/novita"
 	"github.com/songquanpeng/one-api/relay/channeltype"
 	"github.com/songquanpeng/one-api/relay/meta"
@@ -55,6 +56,8 @@ func (a *Adaptor) GetRequestURL(meta *meta.Meta) (string, error) {
 		return novita.GetRequestURL(meta)
 	case channeltype.Friday:
 		return friday.GetRequestURL(meta)
+	case channeltype.Newaliyun:
+		return newaliyun.GetRequestURL(meta)
 	default:
 		return GetFullRequestURL(meta.BaseURL, meta.RequestURLPath, meta.ChannelType), nil
 	}

@@ -11,6 +11,7 @@ import (
 	"github.com/songquanpeng/one-api/relay/adaptor/minimax"
 	"github.com/songquanpeng/one-api/relay/adaptor/mistral"
 	"github.com/songquanpeng/one-api/relay/adaptor/moonshot"
+	"github.com/songquanpeng/one-api/relay/adaptor/newaliyun"
 	"github.com/songquanpeng/one-api/relay/adaptor/novita"
 	"github.com/songquanpeng/one-api/relay/adaptor/panda"
 	"github.com/songquanpeng/one-api/relay/adaptor/siliconflow"
@@ -72,6 +73,8 @@ func GetCompatibleChannelMeta(channelType int) (string, []string) {
 		return "friday", friday.ModelList
 	case channeltype.Panda:
 		return "panda", panda.ModelList
+	case channeltype.Newaliyun:
+		return "newaliyun", newaliyun.ModelList
 	default:
 		return "openai", ModelList
 	}

@@ -9,5 +9,6 @@ var ModelList = []string{
 	"step-2-16k",
 	"step-1v-8k",
 	"step-1v-32k",
+	"step-1.5v-mini",
 	"step-1x-medium",
 }
