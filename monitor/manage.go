@@ -34,8 +34,9 @@ func ShouldDisableChannel(err *model.Error, statusCode int) bool {
 		strings.Contains(lowerMessage, "credit") ||
 		strings.Contains(lowerMessage, "balance") ||
 		strings.Contains(lowerMessage, "permission denied") ||
-  	strings.Contains(lowerMessage, "organization has been restricted") || // groq
-		strings.Contains(lowerMessage, "已欠费") {
+		strings.Contains(lowerMessage, "organization has been restricted") || // groq
+		strings.Contains(lowerMessage, "已欠费") ||
+		strings.Contains(lowerMessage, "余额不足") {
 		return true
 	}
 	return false
