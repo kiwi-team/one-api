@@ -109,10 +109,16 @@ const OtherSetting = () => {
     }
   };
 
+  const invokeSync = async() => {
+    await API.get(`/api/token/invoke-sync`);
+  }
+
   return (
     <Grid columns={1}>
       <Grid.Column>
         <Form loading={loading}>
+          <Header as='h3'>缓存操作</Header>
+          <Form.Button onClick={invokeSync}>刷新缓存</Form.Button>
           <Header as='h3'>通用设置</Header>
           <Form.Button onClick={checkUpdate}>检查更新</Form.Button>
           <Form.Group widths='equal'>

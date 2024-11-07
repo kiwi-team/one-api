@@ -93,6 +93,7 @@ func SetApiRouter(router *gin.Engine) {
 			tokenRoute.POST("/", controller.AddToken)
 			tokenRoute.PUT("/", controller.UpdateToken)
 			tokenRoute.DELETE("/:id", controller.DeleteToken)
+			tokenRoute.GET("/invoke-sync", controller.SyncDataToCache)
 		}
 		redemptionRoute := apiRouter.Group("/redemption")
 		redemptionRoute.Use(middleware.AdminAuth())
