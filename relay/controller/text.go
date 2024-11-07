@@ -42,7 +42,7 @@ func RelayTextHelper(c *gin.Context) *model.ErrorWithStatusCode {
 	// pre-consume quota
 	promptTokens := getPromptTokens(textRequest, meta.Mode)
 	meta.PromptTokens = promptTokens
-	preConsumedQuota, bizErr := preConsumeQuota(ctx, textRequest, promptTokens, ratio, meta)
+	ctx, preConsumedQuota, bizErr := preConsumeQuota(ctx, textRequest, promptTokens, ratio, meta)
 	if bizErr != nil {
 		logger.Warnf(ctx, "preConsumeQuota failed: %+v", *bizErr)
 		return bizErr

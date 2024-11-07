@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/songquanpeng/one-api/common"
@@ -178,6 +179,10 @@ func RelayImageHelper(c *gin.Context, relayMode int) *relaymodel.ErrorWithStatus
 		return openai.ErrorWrapper(errors.New("user quota is not enough"), "insufficient_user_quota", http.StatusForbidden)
 	}
 
+	// 将 start 放入 context 中
+	start := time.Now()
+	ctx = context.WithValue(ctx, startTimeKey, start)
+
 	// do request
 	resp, err := adaptor.DoRequest(c, meta, requestBody)
 	if err != nil {
@@ -201,12 +206,17 @@ func RelayImageHelper(c *gin.Context, relayMode int) *relaymodel.ErrorWithStatus
 		if quota != 0 {
 			tokenName := c.GetString(ctxkey.TokenName)
 			logContent := fmt.Sprintf("模型倍率 %.2f，分组倍率 %.2f", modelRatio, groupRatio)
-			model.RecordConsumeLog(ctx, meta.UserId, meta.ChannelId, 0, 0, imageRequest.Model, tokenName, quota, logContent)
+			milliseconds := 0
+			if startTime, ok := ctx.Value(startTimeKey).(time.Time); ok {
+				// 计算耗时
+				milliseconds = int(time.Since(startTime).Milliseconds())
+			}
+			model.RecordConsumeLog(ctx, meta.UserId, meta.ChannelId, 0, 0, imageRequest.Model, tokenName, quota, logContent, milliseconds)
 			model.UpdateUserUsedQuotaAndRequestCount(meta.UserId, quota)
 			channelId := c.GetInt(ctxkey.ChannelId)
 			model.UpdateChannelUsedQuota(channelId, quota)
 		}
-	}(c.Request.Context())
+	}(ctx)
 
 	// do response
 	_, respErr := adaptor.DoResponse(c, resp, meta)

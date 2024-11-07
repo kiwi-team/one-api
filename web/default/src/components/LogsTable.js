@@ -315,6 +315,15 @@ const LogsTable = () => {
               <Table.HeaderCell
                 style={{ cursor: 'pointer' }}
                 onClick={() => {
+                  sortLog('milliseconds');
+                }}
+                width={1}
+              >
+                耗时(ms) 
+              </Table.HeaderCell>
+              <Table.HeaderCell
+                style={{ cursor: 'pointer' }}
+                onClick={() => {
                   sortLog('quota');
                 }}
                 width={1}
@@ -359,6 +368,7 @@ const LogsTable = () => {
                     <Table.Cell>{log.model_name ? <Label basic>{log.model_name}</Label> : ''}</Table.Cell>
                     <Table.Cell>{log.prompt_tokens ? log.prompt_tokens : ''}</Table.Cell>
                     <Table.Cell>{log.completion_tokens ? log.completion_tokens : ''}</Table.Cell>
+                    <Table.Cell>{log.milliseconds ? log.milliseconds  : '-'}</Table.Cell>
                     <Table.Cell>{log.quota ? renderQuota(log.quota, 6) : ''}</Table.Cell>
                     <Table.Cell>{log.content}</Table.Cell>
                   </Table.Row>
