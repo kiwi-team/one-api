@@ -60,6 +60,7 @@ func Relay(c *gin.Context) {
 	channelName := c.GetString(ctxkey.ChannelName)
 	group := c.GetString(ctxkey.Group)
 	originalModel := c.GetString(ctxkey.OriginalModel)
+	go dbmodel.SaveErrorLog(userId, channelId, channelName, bizErr)
 	go processChannelRelayError(ctx, userId, channelId, channelName, bizErr)
 	requestId := c.GetString(helper.RequestIdKey)
 	retryTimes := config.RetryTimes
@@ -123,13 +124,14 @@ func shouldRetry(c *gin.Context, statusCode int) bool {
 }
 
 func processChannelRelayError(ctx context.Context, userId int, channelId int, channelName string, err *model.ErrorWithStatusCode) {
-	logger.Errorf(ctx, "1 relay error (channel id %d, user id: %d): %s", channelId, userId, err.Message)
+	logger.Errorf(ctx, "relay error (channel id %d, user id: %d): %s", channelId, userId, err.Message)
 	// https://platform.openai.com/docs/guides/error-codes/api-errors
 	if monitor.ShouldDisableChannel(&err.Error, err.StatusCode) {
 		monitor.DisableChannel(channelId, channelName, err.Message)
 	} else {
 		monitor.Emit(channelId, false)
 	}
+
 }
 
 func RelayNotImplemented(c *gin.Context) {
