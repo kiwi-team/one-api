@@ -2,6 +2,8 @@ package monitor
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/songquanpeng/one-api/common/config"
 	"github.com/songquanpeng/one-api/common/logger"
 	"github.com/songquanpeng/one-api/common/message"
@@ -37,10 +39,21 @@ func DisableChannel(channelId int, channelName string, reason string) {
 
 func MetricDisableChannel(channelId int, successRate float64) {
 	model.UpdateChannelStatusById(channelId, model.ChannelStatusAutoDisabled)
+	errlogs, _ := model.GetAllErrorLog(0, 10, channelId)
+	channelName := ""
+	errorMsg := "错误原因	时间<br>"
+	if len(errlogs) > 0 {
+		channelName = errlogs[0].ChannelName
+
+		for _, log := range errlogs {
+			errorMsg = errorMsg + fmt.Sprintf("%s	%s<br>", log.Message, time.Unix(log.CreatedAt, 0).Format("2006-01-01 15:04:05"))
+		}
+	}
 	logger.SysLog(fmt.Sprintf("channel #%d has been disabled due to low success rate: %.2f", channelId, successRate*100))
-	subject := fmt.Sprintf("渠道 #%d 已被禁用", channelId)
+	subject := fmt.Sprintf("渠道[%s] #%d 已被禁用", channelName, channelId)
 	content := fmt.Sprintf("该渠道（#%d）在最近 %d 次调用中成功率为 %.2f%%，低于阈值 %.2f%%，因此被系统自动禁用。",
 		channelId, config.MetricQueueSize, successRate*100, config.MetricSuccessRateThreshold*100)
+	content = content + "\n<br>\n" + errorMsg
 	notifyRootUser(subject, content)
 }
 

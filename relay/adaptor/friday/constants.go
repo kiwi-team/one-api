@@ -7,6 +7,9 @@ var ModelList = []string{
 	"LongCat-Large-32K-Chat",
 	"gpt-4o-mini",
 	"dall-e-3",
+	"InternVL2-8B", // 图文理解
+	"Qwen2-VL",     // 图文理解
+	"glm-4v-9b",    // 图文理解
 	//"claude-3-5-sonnet-20240620",
 	//"claude-3-opus-20240229",
 	//"midjourney",
