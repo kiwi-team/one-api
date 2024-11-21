@@ -50,7 +50,7 @@ var ChannelBaseURLs = []string{
 	"https://chat.sankuai.com",                  // 46
 	"https://api.klingai.com",                   // 47
 	"https://api.bfl.ml",                        // 48
-	"https://api.panda-v.com",                   // 49
+	"https://api.pandalla.ai",                   // 49
 	"https://dashscope.aliyuncs.com",            // 50
 }
 
