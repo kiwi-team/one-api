@@ -45,6 +45,8 @@ func ToAPIType(channelType int) int {
 		apiType = apitype.KlingAI
 	case BFL:
 		apiType = apitype.BFL
+	case AI302:
+		apiType = apitype.AI302
 	}
 
 	return apiType

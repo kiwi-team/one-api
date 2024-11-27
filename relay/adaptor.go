@@ -2,6 +2,7 @@ package relay
 
 import (
 	"github.com/songquanpeng/one-api/relay/adaptor"
+	"github.com/songquanpeng/one-api/relay/adaptor/ai302"
 	"github.com/songquanpeng/one-api/relay/adaptor/aiproxy"
 	"github.com/songquanpeng/one-api/relay/adaptor/ali"
 	"github.com/songquanpeng/one-api/relay/adaptor/anthropic"
@@ -70,6 +71,8 @@ func GetAdaptor(apiType int) adaptor.Adaptor {
 		return &klingai.Adaptor{}
 	case apitype.BFL:
 		return &bfl.Adaptor{}
+	case apitype.AI302:
+		return &ai302.Adaptor{}
 	}
 	return nil
 }

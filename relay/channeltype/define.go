@@ -52,5 +52,6 @@ const (
 	BFL
 	Panda
 	Newaliyun
+	AI302
 	Dummy
 )

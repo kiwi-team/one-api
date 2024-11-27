@@ -36,6 +36,7 @@ export const CHANNEL_OPTIONS = [
   { key: 48, text: 'BFL', value: 48, color: 'blue' },
   { key: 49, text: 'panda', value: 49, color: 'green' },
   { key: 50, text: 'newaliyn', value: 50, color: 'green' },
+  { key: 51, text: 'ai302', value: 51, color: 'green' },
   { key: 8, text: '自定义渠道', value: 8, color: 'pink' },
   { key: 22, text: '知识库：FastGPT', value: 22, color: 'blue' },
   { key: 21, text: '知识库：AI Proxy', value: 21, color: 'purple' },

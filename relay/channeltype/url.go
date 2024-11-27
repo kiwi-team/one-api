@@ -52,6 +52,7 @@ var ChannelBaseURLs = []string{
 	"https://api.bfl.ml",                        // 48
 	"https://api.pandalla.ai",                   // 49
 	"https://dashscope.aliyuncs.com",            // 50
+	"https://api.302.ai",                        // 51
 }
 
 func init() {
