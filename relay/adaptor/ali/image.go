@@ -105,7 +105,7 @@ func asyncTask(taskID string, key string) (*TaskResponse, error, []byte) {
 func asyncTaskWait(taskID string, key string) (*TaskResponse, []byte, error) {
 	waitSeconds := 2
 	step := 0
-	maxStep := 40
+	maxStep := 80
 
 	var taskResponse TaskResponse
 	var responseBody []byte
