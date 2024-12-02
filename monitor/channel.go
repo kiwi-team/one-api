@@ -38,7 +38,7 @@ func DisableChannel(channelId int, channelName string, reason string) {
 }
 
 func MetricDisableChannel(channelId int, successRate float64) {
-	model.UpdateChannelStatusById(channelId, model.ChannelStatusAutoDisabled)
+	//model.UpdateChannelStatusById(channelId, model.ChannelStatusAutoDisabled)
 	errlogs, _ := model.GetAllErrorLog(0, 10, channelId)
 	channelName := ""
 	errorMsg := "错误原因	时间<br>"
@@ -50,8 +50,8 @@ func MetricDisableChannel(channelId int, successRate float64) {
 		}
 	}
 	logger.SysLog(fmt.Sprintf("channel #%d has been disabled due to low success rate: %.2f", channelId, successRate*100))
-	subject := fmt.Sprintf("渠道[%s] #%d 已被禁用", channelName, channelId)
-	content := fmt.Sprintf("该渠道（#%d）在最近 %d 次调用中成功率为 %.2f%%，低于阈值 %.2f%%，因此被系统自动禁用。",
+	subject := fmt.Sprintf("渠道[%s] #%d 错误率太高，请留意", channelName, channelId)
+	content := fmt.Sprintf("该渠道（#%d）在最近 %d 次调用中成功率为 %.2f%%，低于阈值 %.2f%%",
 		channelId, config.MetricQueueSize, successRate*100, config.MetricSuccessRateThreshold*100)
 	content = content + "\n<br>\n" + errorMsg
 	notifyRootUser(subject, content)
