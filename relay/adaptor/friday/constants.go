@@ -21,9 +21,9 @@ var ModelList = []string{
 	"gpt-3.5-turbo-0613",
 	"o1-preview-2024-09-12",
 	"o1-mini-2024-09-12",
-	"anthropic.claude-3.5-sonnet",
-	"anthropic.claude-3.5-sonnet-v2",
-	"anthropic.claude-3-haiku",
-	"anthropic.claude-3-sonnet",
-	"anthropic.claude-3-opus",
+	"claude-3-5-sonnet-20240620", // anthropic.claude-3.5-sonnet  anthropic.claude-3.5-sonnet anthropic.claude-3-5-sonnet-20240620-v1:0
+	"claude-3-5-sonnet-20241022", // anthropic.claude-3.5-sonnet-v2  anthropic.claude-3-5-sonnet-20241022-v2:0
+	"claude-3-haiku-20240307",    // anthropic.claude-3-haiku anthropic.claude-3-haiku-20240307-v1:0
+	"claude-3-sonnet-20240229",   // anthropic.claude-3-sonnet  anthropic.claude-3-sonnet-20240229-v1:0
+	"claude-3-opus-20240229",     // anthropic.claude-3-opus anthropic.claude-3-opus-20240229-v1:0
 }
