@@ -60,7 +60,8 @@ func Relay(c *gin.Context) {
 	channelName := c.GetString(ctxkey.ChannelName)
 	group := c.GetString(ctxkey.Group)
 	originalModel := c.GetString(ctxkey.OriginalModel)
-	go dbmodel.SaveErrorLog(userId, channelId, channelName, bizErr)
+	body, _ := common.GetRequestBody(c)
+	go dbmodel.SaveErrorLog(userId, channelId, channelName, bizErr, string(body))
 	go processChannelRelayError(ctx, userId, channelId, channelName, bizErr)
 	requestId := c.GetString(helper.RequestIdKey)
 	retryTimes := config.RetryTimes
@@ -79,7 +80,7 @@ func Relay(c *gin.Context) {
 			continue
 		}
 		middleware.SetupContextForSelectedChannel(c, channel, originalModel)
-		requestBody, err := common.GetRequestBody(c)
+		requestBody, _ := common.GetRequestBody(c)
 		c.Request.Body = io.NopCloser(bytes.NewBuffer(requestBody))
 		bizErr = relayHelper(c, relayMode)
 		if bizErr == nil {

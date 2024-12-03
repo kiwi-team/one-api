@@ -20,6 +20,7 @@ type ErrorLog struct {
 	Param       string `json:"param" gorm:"default:''"`
 	Code        string `json:"code" gorm:"default:''"`
 	StatusCode  string `json:"status_code" gorm:"default:''"`
+	Body        string `json:"body" gorm:"default:''"`
 }
 
 func GetAllErrorLog(startIdx int, num int, channelId int) ([]*ErrorLog, error) {
@@ -33,7 +34,7 @@ func GetAllErrorLog(startIdx int, num int, channelId int) ([]*ErrorLog, error) {
 	return errorLogs, err
 }
 
-func SaveErrorLog(userId int, channelId int, channelName string, err *model.ErrorWithStatusCode) error {
+func SaveErrorLog(userId int, channelId int, channelName string, err *model.ErrorWithStatusCode, body string) error {
 	log := &ErrorLog{
 		UserId:      userId,
 		CreatedAt:   helper.GetTimestamp(),
@@ -44,6 +45,7 @@ func SaveErrorLog(userId int, channelId int, channelName string, err *model.Erro
 		ChannelName: channelName,
 		Code:        fmt.Sprintf("%v", err.Code),
 		StatusCode:  strconv.Itoa(err.StatusCode),
+		Body:        body,
 	}
 	err1 := DB.Create(log).Error
 	if err1 != nil {
