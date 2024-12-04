@@ -59,9 +59,13 @@ func StreamHandler(c *gin.Context, resp *http.Response, relayMode int) (*model.E
 				// but for empty choice and no usage, we should not pass it to client, this is for azure
 				continue // just ignore empty choice
 			}
+			//fmt.Printf("ddddddd, %s\n", data)
 			render.StringData(c, data)
 			for _, choice := range streamResponse.Choices {
+				// todo 调用百度的安全审查接口，每一个百个字符，拍查一下。
 				responseText += conv.AsString(choice.Delta.Content)
+				//render.StringData(c, conv.AsString(choice.Delta.Content))
+				//time.Sleep(time.Second)
 			}
 			if streamResponse.Usage != nil {
 				usage = streamResponse.Usage
