@@ -6,8 +6,12 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"regexp"
 	"strings"
+	"unicode/utf8"
 
+	"github.com/songquanpeng/one-api/common/contentcheck"
+	"github.com/songquanpeng/one-api/common/helper"
 	"github.com/songquanpeng/one-api/common/render"
 
 	"github.com/gin-gonic/gin"
@@ -33,6 +37,10 @@ func StreamHandler(c *gin.Context, resp *http.Response, relayMode int) (*model.E
 	common.SetEventStreamHeaders(c)
 
 	doneRendered := false
+	preStr := ""
+	content := ""
+	contentCheckResult := ""
+	pass := false
 	for scanner.Scan() {
 		data := scanner.Text()
 		if len(data) < dataPrefixLength { // ignore blank line or wrong format
@@ -59,14 +67,29 @@ func StreamHandler(c *gin.Context, resp *http.Response, relayMode int) (*model.E
 				// but for empty choice and no usage, we should not pass it to client, this is for azure
 				continue // just ignore empty choice
 			}
-			//fmt.Printf("ddddddd, %s\n", data)
 			render.StringData(c, data)
+
 			for _, choice := range streamResponse.Choices {
-				// todo 调用百度的安全审查接口，每一个百个字符，拍查一下。
-				responseText += conv.AsString(choice.Delta.Content)
-				//render.StringData(c, conv.AsString(choice.Delta.Content))
-				//time.Sleep(time.Second)
+				// 调用百度的安全审查接口，每一个百个字符，查一下。
+				tmp := conv.AsString(choice.Delta.Content)
+				responseText += tmp
+				content = content + regexp.MustCompile(`\s+`).ReplaceAllString(tmp, "")
+				// utf8字符串长度>=100，则截断
+				if utf8.RuneCountInString(content) >= 100 {
+					//go func() {
+					pass, contentCheckResult, err = contentcheck.GetAdaptor(contentcheck.Baidu).CheckContent(helper.LastNChars(preStr, 10)+content, 0)
+					if err != nil {
+						logger.SysError("error checking content: " + err.Error())
+					}
+					if !pass {
+						render.BadRequest(c, contentCheckResult)
+						return nil, "", nil
+					}
+					preStr = content
+					content = ""
+				}
 			}
+
 			if streamResponse.Usage != nil {
 				usage = streamResponse.Usage
 			}
@@ -86,6 +109,17 @@ func StreamHandler(c *gin.Context, resp *http.Response, relayMode int) (*model.E
 
 	if err := scanner.Err(); err != nil {
 		logger.SysError("error reading stream: " + err.Error())
+	}
+	if utf8.RuneCountInString(content) > 0 {
+		//go func() {
+		pass, contentCheckResult, err := contentcheck.GetAdaptor(contentcheck.Baidu).CheckContent(helper.LastNChars(preStr, 10)+content, 0)
+		if err != nil {
+			logger.SysError("error checking content: " + err.Error())
+		}
+		if !pass {
+			render.BadRequest(c, contentCheckResult)
+			return nil, "", nil
+		}
 	}
 
 	if !doneRendered {

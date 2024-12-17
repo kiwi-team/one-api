@@ -245,6 +245,8 @@ func updateOptionMap(key string, value string) (err error) {
 		config.QuotaPerUnit, _ = strconv.ParseFloat(value, 64)
 	case "Theme":
 		config.Theme = value
+	case "BaiduAKAndSK":
+		config.BaiduAKAndSK = value
 	}
 	return err
 }

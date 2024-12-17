@@ -3,6 +3,10 @@ package panda
 // https://api.panda-v.com/pricing
 
 var ModelList = []string{
+	"o1-all",
+	"o1-mini-all",
+	"o1-preview-all",
+	"o1-pro-all",
 	"gpt-4-turbo-preview",
 	"gemini-experimental",
 	"pandalla-3-5-sonnet",
@@ -74,5 +78,6 @@ var ModelList = []string{
 	"gemini-1.5-flash-latest",
 	"gemini-1.5-pro-exp-0801",
 	"gemini-1.5-pro-latest",
+	"gemini-2.0-flash-exp",
 	"text-moderation-stable",
 }

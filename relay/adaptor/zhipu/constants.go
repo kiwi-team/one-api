@@ -6,4 +6,5 @@ var ModelList = []string{
 	"glm-4", "glm-4v", "glm-3-turbo", "embedding-2",
 	"cogview-3", "glm-4-flash",
 	"glm-4v-plus",
+	"glm-4-long",
 }

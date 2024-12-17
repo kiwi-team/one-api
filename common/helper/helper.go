@@ -2,8 +2,6 @@ package helper
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/songquanpeng/one-api/common/random"
 	"html/template"
 	"log"
 	"net"
@@ -11,6 +9,9 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+
+	"github.com/gin-gonic/gin"
+	"github.com/songquanpeng/one-api/common/random"
 )
 
 func OpenBrowser(url string) {
@@ -136,4 +137,19 @@ func String2Int(str string) int {
 		return 0
 	}
 	return num
+}
+
+func LastNChars(s string, n int) string {
+	// 获取字符串的长度
+	runeSlice := []rune(s)
+	length := len(runeSlice)
+
+	// 计算起始索引
+	start := length - n
+	if start < 0 {
+		start = 0 // 如果字符串长度小于 n，则从头开始
+	}
+
+	// 返回最后 n 个字符
+	return string(runeSlice[start:])
 }
