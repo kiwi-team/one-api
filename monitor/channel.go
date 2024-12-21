@@ -41,12 +41,12 @@ func MetricDisableChannel(channelId int, successRate float64) {
 	//model.UpdateChannelStatusById(channelId, model.ChannelStatusAutoDisabled)
 	errlogs, _ := model.GetAllErrorLog(0, 10, channelId)
 	channelName := ""
-	errorMsg := "错误原因	时间<br>"
+	errorMsg := "错误原因	时间     状态码<br>"
 	if len(errlogs) > 0 {
 		channelName = errlogs[0].ChannelName
 
 		for _, log := range errlogs {
-			errorMsg = errorMsg + fmt.Sprintf("%s	%s<br>", log.Message, time.Unix(log.CreatedAt, 0).Format("2006-01-01 15:04:05"))
+			errorMsg = errorMsg + fmt.Sprintf("%s	%s    %s<br>", log.StatusCode, log.Message, time.Unix(log.CreatedAt, 0).Format("2006-01-02 15:04:05"))
 		}
 	}
 	logger.SysLog(fmt.Sprintf("channel #%d has been disabled due to low success rate: %.2f", channelId, successRate*100))

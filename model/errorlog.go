@@ -13,7 +13,7 @@ type ErrorLog struct {
 	Id          int    `json:"id"`
 	UserId      int    `json:"user_id" gorm:"index"`
 	CreatedAt   int64  `json:"created_at" gorm:"bigint;index:idx_created_a"`
-	ChannelId   int    `json:"channel" gorm:"index"`
+	ChannelId   int    `json:"channel_id" gorm:"index"`
 	ChannelName string `json:"channel_name" gorm:"default:''"`
 	Message     string `json:"message" gorm:"default:''"`
 	Type        string `json:"type" gorm:"default:''"`
@@ -27,9 +27,7 @@ func GetAllErrorLog(startIdx int, num int, channelId int) ([]*ErrorLog, error) {
 	var errorLogs []*ErrorLog
 	var err error
 	if channelId > 0 {
-		err = DB.Order("id desc").Limit(num).Offset(startIdx).Find(&errorLogs).Error
-	} else {
-		err = DB.Order("id desc").Where("channel = ?", channelId).Limit(num).Offset(startIdx).Find(&errorLogs).Error
+		err = DB.Order("id desc").Where("channel_id = ?", channelId).Limit(num).Offset(startIdx).Find(&errorLogs).Error
 	}
 	return errorLogs, err
 }
