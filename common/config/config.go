@@ -147,7 +147,9 @@ var RateLimitKeyExpirationDuration = 20 * time.Minute
 
 var EnableMetric = env.Bool("ENABLE_METRIC", false)
 var MetricQueueSize = env.Int("METRIC_QUEUE_SIZE", 10)
-var MetricSuccessRateThreshold = env.Float64("METRIC_SUCCESS_RATE_THRESHOLD", 0.8)
+var MetricSuccessRateThreshold = env.Float64("METRIC_SUCCESS_RATE_THRESHOLD", 0.5)   // 成功率阈值(模型+渠道)
+var ModelSuccessRateThreshold = env.Float64("MODEL_SUCCESS_RATE_THRESHOLD", 0.5)     // 模型成功率阈值
+var ChannelSuccessRateThreshold = env.Float64("CHANNEL_SUCCESS_RATE_THRESHOLD", 0.5) //渠道成功率阈值
 var MetricSuccessChanSize = env.Int("METRIC_SUCCESS_CHAN_SIZE", 1024)
 var MetricFailChanSize = env.Int("METRIC_FAIL_CHAN_SIZE", 128)
 

@@ -154,6 +154,7 @@ func Handler(c *gin.Context, resp *http.Response, promptTokens int, modelName st
 			StatusCode: resp.StatusCode,
 		}, nil
 	}
+
 	// Reset response body
 	resp.Body = io.NopCloser(bytes.NewBuffer(responseBody))
 

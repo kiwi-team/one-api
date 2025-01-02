@@ -21,6 +21,7 @@ import (
 
 var DB *gorm.DB
 var LOG_DB *gorm.DB
+var LLMTEST_DB *gorm.DB // 大模型那边的数据库
 
 func CreateRootAccountIfNeed() error {
 	var user User
@@ -162,7 +163,9 @@ func migrateDB() error {
 	// 	return err
 	// }
 	if err = DB.AutoMigrate(&ErrorLog{}); err != nil {
-		fmt.Printf("xxxxxxxx %v", err)
+		return err
+	}
+	if err = DB.AutoMigrate(&OperateLog{}); err != nil {
 		return err
 	}
 	return nil
@@ -195,6 +198,23 @@ func InitLogDB() {
 		return
 	}
 	logger.SysLog("secondary database migrated")
+}
+
+func InitLLMtestDB() {
+	if os.Getenv("LLMTEST_SQL_DSN") == "" {
+		return
+	}
+
+	logger.SysLog("using secondary database for table logs")
+	var err error
+	LLMTEST_DB, err = chooseDB("LLMTEST_SQL_DSN")
+	if err != nil {
+		logger.FatalLog("failed to initialize secondary database: " + err.Error())
+		return
+	}
+
+	setDBConns(LLMTEST_DB)
+
 }
 
 func migrateLOGDB() error {
@@ -234,6 +254,12 @@ func closeDB(db *gorm.DB) error {
 func CloseDB() error {
 	if LOG_DB != DB {
 		err := closeDB(LOG_DB)
+		if err != nil {
+			return err
+		}
+	}
+	if LLMTEST_DB != DB {
+		err := closeDB(LLMTEST_DB)
 		if err != nil {
 			return err
 		}

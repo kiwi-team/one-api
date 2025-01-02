@@ -93,6 +93,7 @@ func TokenAuth() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		ctx := c.Request.Context()
 		key := c.Request.Header.Get("Authorization")
+		modelId := c.Request.Header.Get("llmtest-model-id")
 		key = strings.TrimPrefix(key, "Bearer ")
 		key = strings.TrimPrefix(key, "sk-")
 		parts := strings.Split(key, "-")
@@ -133,6 +134,7 @@ func TokenAuth() func(c *gin.Context) {
 		c.Set(ctxkey.Id, token.UserId)
 		c.Set(ctxkey.TokenId, token.Id)
 		c.Set(ctxkey.TokenName, token.Name)
+		c.Set(ctxkey.ModelId, modelId)
 		if len(parts) > 1 {
 			if model.IsAdmin(token.UserId) {
 				c.Set(ctxkey.SpecificChannelId, parts[1])

@@ -8,6 +8,7 @@ var ModelList = []string{
 	"LongCat-Large-32K-Chat",
 	"LongCat-Lite-8K-Chat",
 	"LongCat-8B-128K-Chat",
+	"LongCat-T2I-Medium", // 文生图
 	"gpt-4o-mini",
 	"dall-e-3",
 	"InternVL2-8B", // 图文理解

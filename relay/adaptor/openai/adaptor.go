@@ -95,6 +95,18 @@ func (a *Adaptor) ConvertImageRequest(request *model.ImageRequest) (any, error) 
 	if request == nil {
 		return nil, errors.New("request is nil")
 	}
+	if request.Model == "LongCat-T2I-Medium" {
+		newRequest := TextRequest{
+			Model: request.Model,
+			Messages: []model.Message{
+				{
+					Role:    "user",
+					Content: request.Prompt,
+				},
+			},
+		}
+		return newRequest, nil
+	}
 	return request, nil
 }
 

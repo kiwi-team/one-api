@@ -12,10 +12,13 @@ func GetRequestURL(meta *meta.Meta) (string, error) {
 	case relaymode.ChatCompletions:
 		return fmt.Sprintf("%s/v1/openai/native/chat/completions", meta.BaseURL), nil
 	case relaymode.ImagesGenerations:
+		if meta.OriginModelName == "LongCat-T2I-Medium" {
+			return fmt.Sprintf("%s/v1/openai/native/chat/completions", meta.BaseURL), nil
+		}
 		return fmt.Sprintf("%s/v1/openai/native/images/generations", meta.BaseURL), nil
 	case relaymode.Embeddings:
 		return fmt.Sprintf("%s/v1/openai/native/embeddings", meta.BaseURL), nil
 	default:
 	}
-	return "", fmt.Errorf("unsupported relay mode %d for doubao", meta.Mode)
+	return "", fmt.Errorf("unsupported relay mode %d for friday", meta.Mode)
 }

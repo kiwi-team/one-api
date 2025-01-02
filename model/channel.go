@@ -221,3 +221,11 @@ func DeleteDisabledChannel() (int64, error) {
 	result := DB.Where("status = ? or status = ?", ChannelStatusAutoDisabled, ChannelStatusManuallyDisabled).Delete(&Channel{})
 	return result.RowsAffected, result.Error
 }
+
+// 通过模型名称，查找对应的渠道
+func GetChannelsByModelName(modelName string) ([]*Channel, error) {
+	var channels []*Channel
+	sql := "select a.* from channels a join abilities b on a.id = b.channel_id where b.model = ? and a.status = ? and b.enabled = true"
+	err := DB.Raw(sql, modelName, ChannelStatusEnabled).Scan(&channels).Error
+	return channels, err
+}

@@ -44,6 +44,9 @@ func relayHelper(c *gin.Context, relayMode int) *model.ErrorWithStatusCode {
 
 func Relay(c *gin.Context) {
 	ctx := c.Request.Context()
+	modelName := c.GetString(ctxkey.RequestModel)
+	modelId := c.GetString(ctxkey.ModelId)
+	fmt.Println("modelId: ", modelId)
 	relayMode := relaymode.GetByPath(c.Request.URL.Path)
 	if config.DebugEnabled {
 		requestBody, _ := common.GetRequestBody(c)
@@ -53,7 +56,7 @@ func Relay(c *gin.Context) {
 	userId := c.GetInt(ctxkey.Id)
 	bizErr := relayHelper(c, relayMode)
 	if bizErr == nil {
-		monitor.Emit(channelId, true)
+		monitor.Emit(channelId, modelName, modelId, true)
 		return
 	}
 	lastFailedChannelId := channelId
@@ -61,8 +64,8 @@ func Relay(c *gin.Context) {
 	group := c.GetString(ctxkey.Group)
 	originalModel := c.GetString(ctxkey.OriginalModel)
 	body, _ := common.GetRequestBody(c)
-	go dbmodel.SaveErrorLog(userId, channelId, channelName, bizErr, string(body))
-	go processChannelRelayError(ctx, userId, channelId, channelName, bizErr)
+	go dbmodel.SaveErrorLog(userId, channelId, channelName, modelName, bizErr, string(body))
+	go processChannelRelayError(ctx, userId, channelId, channelName, bizErr, modelName, modelId)
 	requestId := c.GetString(helper.RequestIdKey)
 	retryTimes := config.RetryTimes
 	if !shouldRetry(c, bizErr.StatusCode) {
@@ -90,7 +93,7 @@ func Relay(c *gin.Context) {
 		lastFailedChannelId = channelId
 		channelName := c.GetString(ctxkey.ChannelName)
 		// BUG: bizErr is in race condition
-		go processChannelRelayError(ctx, userId, channelId, channelName, bizErr)
+		go processChannelRelayError(ctx, userId, channelId, channelName, bizErr, modelName, modelId)
 	}
 	if bizErr != nil {
 		if bizErr.StatusCode == http.StatusTooManyRequests {
@@ -124,13 +127,13 @@ func shouldRetry(c *gin.Context, statusCode int) bool {
 	return true
 }
 
-func processChannelRelayError(ctx context.Context, userId int, channelId int, channelName string, err *model.ErrorWithStatusCode) {
+func processChannelRelayError(ctx context.Context, userId int, channelId int, channelName string, err *model.ErrorWithStatusCode, modelName string, modelId string) {
 	logger.Errorf(ctx, "relay error (channel id %d, user id: %d): %s", channelId, userId, err.Message)
 	// https://platform.openai.com/docs/guides/error-codes/api-errors
 	if monitor.ShouldDisableChannel(&err.Error, err.StatusCode) {
 		monitor.DisableChannel(channelId, channelName, err.Message)
 	} else {
-		monitor.Emit(channelId, false)
+		monitor.Emit(channelId, modelName, modelId, false)
 	}
 
 }

@@ -2,11 +2,12 @@ package middleware
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/gin-gonic/gin"
 	"github.com/songquanpeng/one-api/common"
 	"github.com/songquanpeng/one-api/common/helper"
 	"github.com/songquanpeng/one-api/common/logger"
-	"strings"
 )
 
 func abortWithMessage(c *gin.Context, statusCode int, message string) {
@@ -47,6 +48,14 @@ func getRequestModel(c *gin.Context) (string, error) {
 		}
 	}
 	return modelRequest.Model, nil
+}
+
+func GetModel(c *gin.Context) string {
+	modelName, err := getRequestModel(c)
+	if err != nil {
+		return ""
+	}
+	return modelName
 }
 
 func isModelInList(modelName string, models string) bool {

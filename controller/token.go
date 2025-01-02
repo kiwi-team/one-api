@@ -2,6 +2,9 @@ package controller
 
 import (
 	"fmt"
+	"net/http"
+	"strconv"
+
 	"github.com/gin-gonic/gin"
 	"github.com/songquanpeng/one-api/common/config"
 	"github.com/songquanpeng/one-api/common/ctxkey"
@@ -9,8 +12,6 @@ import (
 	"github.com/songquanpeng/one-api/common/network"
 	"github.com/songquanpeng/one-api/common/random"
 	"github.com/songquanpeng/one-api/model"
-	"net/http"
-	"strconv"
 )
 
 func GetAllTokens(c *gin.Context) {
