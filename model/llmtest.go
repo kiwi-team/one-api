@@ -122,7 +122,7 @@ func AutoEnableArenaModel() (string, string) {
 	sql := `select max(id) as id, "model_id" as "modelId",max("next_enable_time") as "nextEnableTime"  from "operate_logs" where action = ? and ("created_day" = ? or "created_day" = ?) group by "model_id"`
 	err := DB.Raw(sql, action, day, yesterDay).Scan(&opList).Error
 	if err != nil {
-		logger.SysError("failed to auto enable AIModelChannels: " + err.Error())
+		logger.SysError("failed to auto enable AutoEnableArenaModel: " + err.Error())
 	}
 	now := helper.GetTimestamp()
 	subject := ""
@@ -132,11 +132,12 @@ func AutoEnableArenaModel() (string, string) {
 		if op.NextEnableTime < now {
 			err = UpdateLLMTestModel(op.ModeId, LLLMTEST_MODEL_ENABLED)
 			if err != nil {
-				logger.SysError("failed to auto enable AIModelChannels: " + err.Error())
+				logger.SysError("failed to UpdateLLMTestModel: " + err.Error())
 			}
 			SaveEnableOperateLog(op.Id)
 			arenaModel, err := GetLLMTestModel(op.ModeId)
 			if err != nil {
+				logger.SysError("failed to GetLLMTestModel: " + op.ModeId + err.Error())
 				continue
 			}
 			i = i + 1

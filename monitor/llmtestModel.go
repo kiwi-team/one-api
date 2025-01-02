@@ -57,7 +57,9 @@ func AutoEnable() {
 	for {
 		time.Sleep(1 * time.Minute)
 		model.AutoEnableModelChannel()
+		logger.SysLog("auto enable model channel")
 		subject, content := model.AutoEnableArenaModel()
+		logger.SysLog("auto enable arena model")
 		if len(subject) > 0 && len(content) > 0 {
 			notifyRootUser(subject, content)
 		}
