@@ -18,23 +18,23 @@ const (
 
 type LLMTestModel struct {
 	Id          int    `json:"id"`
-	ModelId     string `json:"modelId"`
-	ModelType   int    `json:"modelType"`
-	CompanyName string `json:"companyName"`
-	ModelName   string `json:"modelName"`
-	Nickname    string `json:"nickname"`
-	OneApiKey   string `json:"oneApiKey"`
-	Status      int    `json:"status"`
+	ModelId     string `json:"modelId" gorm:"column:modelId"`
+	ModelType   int    `json:"modelType" gorm:"column:modelType"`
+	CompanyName string `json:"companyName" gorm:"column:companyName"`
+	ModelName   string `json:"modelName" gorm:"column:modelName"`
+	Nickname    string `json:"nickname" gorm:"column:nickname"`
+	OneApiKey   string `json:"oneApiKey" gorm:"column:oneApiKey"`
+	Status      int    `json:"status" gorm:"column:status"`
 }
 
 type TotalRes struct {
-	Total int `json:"total"`
+	Total int `json:"total" gorm:"column:total"`
 }
 
 type OpItem struct {
 	Id             int    `json:"id"`
-	ModeId         string `json:"modelId"`
-	NextEnableTime int64  `json:"nextEnableTime"`
+	ModeId         string `json:"modelId" gorm:"column:modelId"`
+	NextEnableTime int64  `json:"nextEnableTime" gorm:"column:nextEnableTime"`
 }
 
 func GetArenaModelTypeName(modelType int) string {
@@ -57,8 +57,8 @@ func GetArenaModelTypeName(modelType int) string {
 
 }
 
-func GetLLMTestModel(modelId string) (LLMTestModel, error) {
-	var model LLMTestModel
+func GetLLMTestModel(modelId string) (*LLMTestModel, error) {
+	var model *LLMTestModel
 	sql := `select id,"modelId","modelType","companyName","modelName","nickname","status","oneApiKey" from "AIModel" where "modelId" = ?`
 	err := LLMTEST_DB.Raw(sql, modelId).Scan(&model).Error
 	return model, err

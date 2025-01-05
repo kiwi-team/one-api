@@ -10,6 +10,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
+	"github.com/songquanpeng/one-api/common/config"
 	"github.com/songquanpeng/one-api/common/contentcheck"
 	"github.com/songquanpeng/one-api/common/helper"
 	"github.com/songquanpeng/one-api/common/render"
@@ -68,28 +69,29 @@ func StreamHandler(c *gin.Context, resp *http.Response, relayMode int) (*model.E
 				continue // just ignore empty choice
 			}
 			render.StringData(c, data)
-
-			for _, choice := range streamResponse.Choices {
-				// 调用百度的安全审查接口，每一个百个字符，查一下。
-				tmp := conv.AsString(choice.Delta.Content)
-				responseText += tmp
-				content = content + regexp.MustCompile(`\s+`).ReplaceAllString(tmp, "")
-				// utf8字符串长度>=100，则截断
-				if utf8.RuneCountInString(content) >= 100 {
-					//go func() {
-					pass, contentCheckResult, err = contentcheck.GetAdaptor(contentcheck.Baidu).CheckContent(helper.LastNChars(preStr, 10)+content, 0)
-					if err != nil {
-						logger.SysError("error checking content: " + err.Error())
+			if config.BaiduAKAndSK != "" {
+				for _, choice := range streamResponse.Choices {
+					// 调用百度的安全审查接口，每一个百个字符，查一下。
+					tmp := conv.AsString(choice.Delta.Content)
+					responseText += tmp
+					content = content + regexp.MustCompile(`\s+`).ReplaceAllString(tmp, "")
+					// utf8字符串长度>=100，则截断
+					if utf8.RuneCountInString(content) >= 100 {
+						//go func() {
+						pass, contentCheckResult, err = contentcheck.GetAdaptor(contentcheck.Baidu).CheckContent(helper.LastNChars(preStr, 10)+content, 0)
+						if err != nil {
+							logger.SysError("error checking content: " + err.Error())
+						}
+						if !pass {
+							render.BadRequest(c, contentCheckResult)
+							return nil, "", nil
+						}
+						preStr = content
+						content = ""
 					}
-					if !pass {
-						render.BadRequest(c, contentCheckResult)
-						return nil, "", nil
-					}
-					preStr = content
-					content = ""
 				}
-			}
 
+			}
 			if streamResponse.Usage != nil {
 				usage = streamResponse.Usage
 			}
