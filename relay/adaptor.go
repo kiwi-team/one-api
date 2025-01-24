@@ -16,6 +16,7 @@ import (
 	"github.com/songquanpeng/one-api/relay/adaptor/gemini"
 	"github.com/songquanpeng/one-api/relay/adaptor/imaginepro"
 	"github.com/songquanpeng/one-api/relay/adaptor/klingai"
+	"github.com/songquanpeng/one-api/relay/adaptor/midjourney"
 	"github.com/songquanpeng/one-api/relay/adaptor/ollama"
 	"github.com/songquanpeng/one-api/relay/adaptor/openai"
 	"github.com/songquanpeng/one-api/relay/adaptor/palm"
@@ -73,6 +74,8 @@ func GetAdaptor(apiType int) adaptor.Adaptor {
 		return &bfl.Adaptor{}
 	case apitype.AI302:
 		return &ai302.Adaptor{}
+	case apitype.Midjourney:
+		return &midjourney.Adaptor{}
 	}
 	return nil
 }

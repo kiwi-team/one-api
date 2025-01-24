@@ -1,6 +1,8 @@
 package channeltype
 
-import "github.com/songquanpeng/one-api/relay/apitype"
+import (
+	"github.com/songquanpeng/one-api/relay/apitype"
+)
 
 func ToAPIType(channelType int) int {
 	apiType := apitype.OpenAI
@@ -47,6 +49,8 @@ func ToAPIType(channelType int) int {
 		apiType = apitype.BFL
 	case AI302:
 		apiType = apitype.AI302
+	case Midjourney:
+		apiType = apitype.Midjourney
 	}
 
 	return apiType

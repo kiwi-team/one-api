@@ -53,5 +53,6 @@ const (
 	Panda
 	Newaliyun
 	AI302
+	Midjourney
 	Dummy
 )

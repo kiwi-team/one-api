@@ -23,6 +23,7 @@ const (
 	KlingAI
 	BFL
 	AI302
+	Midjourney
 
 	Dummy // this one is only for count, do not add any channel after this
 )
