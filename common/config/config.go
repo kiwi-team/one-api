@@ -118,6 +118,9 @@ var GeminiSafetySetting = env.String("GEMINI_SAFETY_SETTING", "BLOCK_NONE")
 
 var Theme = env.String("THEME", "default")
 var BaiduAKAndSK = ""
+var ContentCheckKeyWords = ""
+var ContentCheckPerLength = 100   //一次检查多少个字符
+var ContentCheckPrefixLength = 10 // 上一次内容检查的最后10个字符,参与到下一次内容检查
 var ValidThemes = map[string]bool{
 	"default": true,
 	"berry":   true,

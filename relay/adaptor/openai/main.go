@@ -76,12 +76,9 @@ func StreamHandler(c *gin.Context, resp *http.Response, relayMode int) (*model.E
 					responseText += tmp
 					content = content + regexp.MustCompile(`\s+`).ReplaceAllString(tmp, "")
 					// utf8字符串长度>=100，则截断
-					if utf8.RuneCountInString(content) >= 100 {
+					if utf8.RuneCountInString(content) >= config.ContentCheckPerLength {
 						//go func() {
-						pass, contentCheckResult, err = contentcheck.GetAdaptor(contentcheck.Baidu).CheckContent(helper.LastNChars(preStr, 10)+content, 0)
-						if err != nil {
-							logger.SysError("error checking content: " + err.Error())
-						}
+						pass, contentCheckResult = contentCheck(preStr, content)
 						if !pass {
 							render.BadRequest(c, contentCheckResult)
 							return nil, "", nil
@@ -113,15 +110,12 @@ func StreamHandler(c *gin.Context, resp *http.Response, relayMode int) (*model.E
 		logger.SysError("error reading stream: " + err.Error())
 	}
 	if utf8.RuneCountInString(content) > 0 {
-		//go func() {
-		pass, contentCheckResult, err := contentcheck.GetAdaptor(contentcheck.Baidu).CheckContent(helper.LastNChars(preStr, 10)+content, 0)
-		if err != nil {
-			logger.SysError("error checking content: " + err.Error())
-		}
+		pass, contentCheckResult := contentCheck(preStr, content)
 		if !pass {
 			render.BadRequest(c, contentCheckResult)
 			return nil, "", nil
 		}
+
 	}
 
 	if !doneRendered {
@@ -134,6 +128,25 @@ func StreamHandler(c *gin.Context, resp *http.Response, relayMode int) (*model.E
 	}
 
 	return nil, responseText, usage
+}
+
+func contentCheck(preStr string, content string) (bool, string) {
+	pass, contentCheckResult, err := contentcheck.GetAdaptor(contentcheck.Keyword).CheckContent(helper.LastNChars(preStr, config.ContentCheckPrefixLength)+content, 0)
+	if err != nil {
+		logger.SysError("error keyword checking content: " + err.Error())
+	}
+	if !pass {
+		return pass, contentCheckResult
+	}
+
+	pass, contentCheckResult, err = contentcheck.GetAdaptor(contentcheck.Baidu).CheckContent(helper.LastNChars(preStr, config.ContentCheckPrefixLength)+content, 0)
+	if err != nil {
+		logger.SysError("error baidu checking content: " + err.Error())
+	}
+	if !pass {
+		return pass, contentCheckResult
+	}
+	return true, ""
 }
 
 func Handler(c *gin.Context, resp *http.Response, promptTokens int, modelName string) (*model.ErrorWithStatusCode, *model.Usage) {

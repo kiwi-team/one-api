@@ -247,6 +247,12 @@ func updateOptionMap(key string, value string) (err error) {
 		config.Theme = value
 	case "BaiduAKAndSK":
 		config.BaiduAKAndSK = value
+	case "ContentCheckKeyWords":
+		config.ContentCheckKeyWords = value
+	case "ContentCheckPerLength":
+		config.ContentCheckPerLength, _ = strconv.Atoi(value)
+	case "ContentCheckPrefixLength":
+		config.ContentCheckPrefixLength, _ = strconv.Atoi(value)
 	}
 	return err
 }
