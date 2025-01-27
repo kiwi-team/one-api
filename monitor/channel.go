@@ -36,7 +36,7 @@ func DisableChannel(channelId int, channelName string, reason string) {
 	logger.SysLog(fmt.Sprintf("channel #%d has been disabled: %s", channelId, reason))
 	subject := fmt.Sprintf("渠道「%s」（#%d）已被禁用", channelName, channelId)
 	content := fmt.Sprintf("渠道「%s」（#%d）已被禁用，原因：%s", channelName, channelId, reason)
-	notifyRootUser(subject, content)
+	notifyRootUser(subject, subject+"\n<br>\n"+content)
 }
 
 func MetricDisableChannel(channelId int, successRate float64) {
@@ -57,7 +57,7 @@ func MetricDisableChannel(channelId int, successRate float64) {
 	content := fmt.Sprintf("该渠道（#%d）在最近 %d 次调用中成功率为 %.2f%%，低于阈值 %.2f%%",
 		channelId, config.MetricQueueSize, successRate*100, config.ChannelSuccessRateThreshold*100)
 	content = content + "\n<br>\n" + errorMsg
-	notifyRootUser(subject, content)
+	notifyRootUser(subject, subject+"\n<br>\n"+content)
 }
 
 func MetricDisableChannelModel(key string, successRate float64) {
@@ -125,7 +125,7 @@ func MetricDisableChannelModel(key string, successRate float64) {
 		content = content + "\n<br>\n" + errorMsg
 		subject = fmt.Sprintf("渠道[%s] #%d 模型[%s] 错误率太高，请留意", channelName, channelId, modelName)
 	}
-	notifyRootUser(subject, content)
+	notifyRootUser(subject, subject+"\n<br>\n"+content)
 }
 
 // EnableChannel enable & notify
@@ -134,5 +134,5 @@ func EnableChannel(channelId int, channelName string) {
 	logger.SysLog(fmt.Sprintf("channel #%d has been enabled", channelId))
 	subject := fmt.Sprintf("渠道「%s」（#%d）已被启用", channelName, channelId)
 	content := fmt.Sprintf("渠道「%s」（#%d）已被启用", channelName, channelId)
-	notifyRootUser(subject, content)
+	notifyRootUser(subject, subject+"\n<br>\n"+content)
 }

@@ -65,8 +65,9 @@ func GetLLMTestModel(modelId string) (*LLMTestModel, error) {
 }
 
 func UpdateLLMTestModel(modelId string, status int) error {
-	sql := `update "AIModel" set status = ? where "modelId" = ?`
-	err := LLMTEST_DB.Exec(sql, status, modelId).Error
+	sql := `update "AIModel" set status = ?,"changeStatusAt"= ? where "modelId" = ?`
+	changeStatusAt := helper.FormatTime(time.Now()) //10分钟后，这个渠道再次启用
+	err := LLMTEST_DB.Exec(sql, status, changeStatusAt, modelId).Error
 	return err
 }
 

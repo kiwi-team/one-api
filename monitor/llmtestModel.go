@@ -49,7 +49,7 @@ func MetricDisableModel(modelId string, successRate float64) {
 		msg, _ := model.SaveDisableOperateLog(0, 0, "", modelName, modelId, content, subject)
 		subject = subject + msg
 	}
-	notifyRootUser(subject, content)
+	notifyRootUser(subject, subject+"\n<br>\n"+content)
 }
 
 func AutoEnable() {
@@ -61,7 +61,7 @@ func AutoEnable() {
 		subject, content := model.AutoEnableArenaModel()
 		logger.SysLog("auto enable arena model")
 		if len(subject) > 0 && len(content) > 0 {
-			notifyRootUser(subject, content)
+			notifyRootUser(subject, subject+"\n<br>\n"+content)
 		}
 	}
 }
