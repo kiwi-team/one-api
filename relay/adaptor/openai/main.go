@@ -136,6 +136,7 @@ func contentCheck(preStr string, content string) (bool, string) {
 		logger.SysError("error keyword checking content: " + err.Error())
 	}
 	if !pass {
+		// todo 调用 gpt-4o-mini 判断是否泄漏模型身份
 		return pass, contentCheckResult
 	}
 

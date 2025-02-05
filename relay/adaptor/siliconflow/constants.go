@@ -40,6 +40,7 @@ var ModelList = []string{
 	"Vendor-A/Qwen/Qwen2.5-72B-Instruct",
 	"deepseek-ai/DeepSeek-V2-Chat",
 	"deepseek-ai/DeepSeek-V2.5",
+	"deepseek-ai/DeepSeek-R1",
 	"google/gemma-2-27b-it",
 	"google/gemma-2-9b-it",
 	"internlm/internlm2_5-20b-chat",
@@ -59,4 +60,5 @@ var ModelList = []string{
 	"stabilityai/stable-diffusion-3-medium",
 	"stabilityai/stable-diffusion-xl-base-1.0",
 	"stabilityai/stable-diffusion-2-1",
+	"deepseek-ai/Janus-Pro-7B",
 }

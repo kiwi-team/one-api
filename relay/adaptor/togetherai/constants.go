@@ -7,4 +7,5 @@ var ModelList = []string{
 	"deepseek-ai/deepseek-coder-33b-instruct",
 	"mistralai/Mixtral-8x22B-Instruct-v0.1",
 	"Qwen/Qwen1.5-72B-Chat",
+	"deepseek-ai/DeepSeek-R1",
 }
