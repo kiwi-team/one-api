@@ -73,12 +73,12 @@ func UpdateLLMTestModel(modelId string, status int) error {
 
 func UpdateAIModelChannelStatus(modelId string, channelId int, status int) error {
 	if status == LLLMTEST_MODEL_CHANNEL_ENABLED {
-		sql := `update "AIModelChannels" set status = ?  where "modelId" = ? and "channelId" = ?`
+		sql := `update "AIModelChannels" set status = ?  where "modelId" = ? and "channelId" = ? and deleted = 0`
 		err := LLMTEST_DB.Exec(sql, status, modelId, channelId).Error
 		return err
 	} else {
 		nextEnableTime := helper.FormatTime(time.Now().Add(time.Minute * 10)) //10分钟后，这个渠道再次启用
-		sql := `update "AIModelChannels" set status = ?,"nextEnableTime" = ? where "modelId" = ? and "channelId" = ?`
+		sql := `update "AIModelChannels" set status = ?,"nextEnableTime" = ? where "modelId" = ? and "channelId" = ? and deleted = 0`
 		err := LLMTEST_DB.Exec(sql, status, nextEnableTime, modelId, channelId).Error
 		return err
 	}
@@ -86,7 +86,7 @@ func UpdateAIModelChannelStatus(modelId string, channelId int, status int) error
 
 func GetAIModelEnabledChannelCount(modelId string, channelId int) (int, error) {
 	var count *TotalRes
-	sql := `select count(1) as total from "AIModelChannels" where "modelId" = ? and "channelId" = ?`
+	sql := `select count(1) as total from "" where "modelId" = ? and "channelId" = ?`
 	err := LLMTEST_DB.Raw(sql, modelId, channelId).Scan(&count).Error
 	if err != nil {
 		return 0, err
@@ -94,7 +94,7 @@ func GetAIModelEnabledChannelCount(modelId string, channelId int) (int, error) {
 	if count.Total < 1 {
 		return 0, nil
 	} else {
-		sql := `select count(1) as total from "AIModelChannels" where "modelId" = ? and "channelId" = ? and status = ?`
+		sql := `select count(1) as total from "AIModelChannels" where "modelId" = ? and "channelId" = ? and status = ? and deleted = 0`
 		err := LLMTEST_DB.Raw(sql, modelId, channelId, LLLMTEST_MODEL_CHANNEL_ENABLED).Scan(&count).Error
 		if err != nil {
 			return 0, err
@@ -108,7 +108,7 @@ func GetAIModelEnabledChannelCount(modelId string, channelId int) (int, error) {
 }
 
 func AutoEnableModelChannel() {
-	sql := `update "AIModelChannels" set status = 1 where "nextEnableTime" < ? and status = 2`
+	sql := `update "AIModelChannels" set status = 1 where "nextEnableTime" < ? and status = 2 and deleted = 0`
 	err := LLMTEST_DB.Exec(sql, helper.FormatTime(time.Now())).Error
 	if err != nil {
 		logger.SysError("failed to auto enable AIModelChannels: " + err.Error())
