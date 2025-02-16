@@ -72,6 +72,24 @@ func (m Message) ParseContent() []MessageContent {
 						},
 					})
 				}
+			case ContentTypeAudioURL:
+				if subObj, ok := contentMap["audio_url"].(map[string]any); ok {
+					contentList = append(contentList, MessageContent{
+						Type: ContentTypeAudioURL,
+						AudioURL: &AudioURL{
+							Url: subObj["url"].(string),
+						},
+					})
+				}
+			case ContentTypeVideoURL:
+				if subObj, ok := contentMap["video_url"].(map[string]any); ok {
+					contentList = append(contentList, MessageContent{
+						Type: ContentTypeVideoURL,
+						VideoURL: &VideoURL{
+							Url: subObj["url"].(string),
+						},
+					})
+				}
 			}
 		}
 		return contentList
@@ -84,8 +102,20 @@ type ImageURL struct {
 	Detail string `json:"detail,omitempty"`
 }
 
+type AudioURL struct {
+	Url    string `json:"url,omitempty"`
+	Detail string `json:"detail,omitempty"`
+}
+
+type VideoURL struct {
+	Url    string `json:"url,omitempty"`
+	Detail string `json:"detail,omitempty"`
+}
+
 type MessageContent struct {
 	Type     string    `json:"type,omitempty"`
 	Text     string    `json:"text"`
 	ImageURL *ImageURL `json:"image_url,omitempty"`
+	AudioURL *AudioURL `json:"audio_url,omitempty"`
+	VideoURL *VideoURL `json:"video_url,omitempty"`
 }

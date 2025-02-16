@@ -24,6 +24,7 @@ const (
 	BFL
 	AI302
 	Midjourney
+	Ailab
 
 	Dummy // this one is only for count, do not add any channel after this
 )

@@ -154,6 +154,8 @@ func RelayImageHelper(c *gin.Context, relayMode int) *relaymodel.ErrorWithStatus
 	switch meta.ChannelType {
 	case channeltype.Friday:
 		fallthrough
+	case channeltype.Ailab:
+		fallthrough
 	case channeltype.Ali:
 		fallthrough
 	case channeltype.Baidu:

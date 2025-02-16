@@ -54,6 +54,7 @@ var ChannelBaseURLs = []string{
 	"https://dashscope.aliyuncs.com",            // 50
 	"https://api.302.ai",                        // 51
 	"",                                          // 52
+	"",                                          // 53
 }
 
 func init() {

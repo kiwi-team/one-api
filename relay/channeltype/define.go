@@ -54,5 +54,6 @@ const (
 	Newaliyun
 	AI302
 	Midjourney
+	Ailab
 	Dummy
 )

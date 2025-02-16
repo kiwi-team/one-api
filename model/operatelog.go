@@ -36,7 +36,7 @@ func SaveDisableOperateLog(userId int, channelId int, channelName string, modelN
 	action := "disable"
 	day := helper.GetDayString()
 	var len int64
-	err := DB.Model(&OperateLog{}).Where("model_id = ? and action = ? and created_day = ?", modelId, action, day).Count(&len).Error
+	err := DB.Model(&OperateLog{}).Where("model_id = ? and created_day = ?", modelId, day).Count(&len).Error
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		logger.SysError("failed to get last operate_log: " + err.Error())
 		return "", err
@@ -56,7 +56,7 @@ func SaveDisableOperateLog(userId int, channelId int, channelName string, modelN
 	case 3:
 		fallthrough
 	default:
-		disableTime = "600d"
+		disableTime = "60d"
 		nextEnableTime = helper.GetTimestamp() + 600*24*60*60
 		msg += " 需要手动启用！"
 	}

@@ -118,6 +118,32 @@ func ConvertRequest(textRequest model.GeneralOpenAIRequest) *ChatRequest {
 						Data:     data,
 					},
 				})
+			} else if part.Type == model.ContentTypeAudioURL {
+				mType, err := helper.DetectFileFromURL(part.AudioURL.Url)
+				if err != nil {
+					logger.SysError("detect file content type error: " + err.Error() + " url: " + part.AudioURL.Url)
+					continue
+				}
+				parts = append(parts, Part{
+					FileData: &FileData{
+						MimeType: mType.String(),
+						FileUri:  part.AudioURL.Url,
+					},
+				})
+			} else if part.Type == model.ContentTypeVideoURL {
+				mType, err := helper.DetectFileFromURL(part.VideoURL.Url)
+				if err != nil {
+					logger.SysError("detect file content type error: " + err.Error() + " url: " + part.VideoURL.Url)
+					continue
+				}
+				parts = append(parts, Part{
+					FileData: &FileData{
+						MimeType: mType.String(),
+						FileUri:  part.VideoURL.Url,
+					},
+				})
+			} else {
+				logger.SysError("unsupported content type: " + part.Type)
 			}
 		}
 		content.Parts = parts

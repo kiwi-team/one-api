@@ -74,7 +74,6 @@ if (isMobile()) {
 }
 
 export function showError(error) {
-  console.error(error);
   if (error.message) {
     if (error.name === 'AxiosError') {
       switch (error.response.status) {
