@@ -14,3 +14,9 @@ func TestDetectFileFromURL(t *testing.T) {
 	mime, err = DetectFileFromURL(url)
 	fmt.Println(mime, err)
 }
+
+func TestDetectFileAndBase64File(t *testing.T) {
+	url := "https://llmstatic.s3.cn-northwest-1.amazonaws.com.cn/e568dd8dce441eecc168bde02c261d50a/file-1739520908853efmpETW3eCfP.wav"
+	mime, base64Data, err := DetectFileAndBase64File(url)
+	fmt.Println(mime, base64Data, err)
+}

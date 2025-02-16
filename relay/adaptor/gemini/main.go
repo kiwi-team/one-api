@@ -119,27 +119,27 @@ func ConvertRequest(textRequest model.GeneralOpenAIRequest) *ChatRequest {
 					},
 				})
 			} else if part.Type == model.ContentTypeAudioURL {
-				mType, err := helper.DetectFileFromURL(part.AudioURL.Url)
+				mType, content, err := helper.DetectFileAndBase64File(part.AudioURL.Url)
 				if err != nil {
 					logger.SysError("detect file content type error: " + err.Error() + " url: " + part.AudioURL.Url)
 					continue
 				}
 				parts = append(parts, Part{
-					FileData: &FileData{
+					InlineData: &InlineData{
 						MimeType: mType.String(),
-						FileUri:  part.AudioURL.Url,
+						Data:     content,
 					},
 				})
 			} else if part.Type == model.ContentTypeVideoURL {
-				mType, err := helper.DetectFileFromURL(part.VideoURL.Url)
+				mType, content, err := helper.DetectFileAndBase64File(part.VideoURL.Url)
 				if err != nil {
 					logger.SysError("detect file content type error: " + err.Error() + " url: " + part.VideoURL.Url)
 					continue
 				}
 				parts = append(parts, Part{
-					FileData: &FileData{
+					InlineData: &InlineData{
 						MimeType: mType.String(),
-						FileUri:  part.VideoURL.Url,
+						Data:     content,
 					},
 				})
 			} else {
