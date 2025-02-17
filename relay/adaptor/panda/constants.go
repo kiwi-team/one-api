@@ -76,8 +76,13 @@ var ModelList = []string{
 	"gpt-4-vision-preview",
 	"tts-1-hd",
 	"gemini-1.5-flash-latest",
+	"gemini-1.5-flash-001",
+	"gemini-1.5-pro",
+	"gemini-1.5-pro-001",
 	"gemini-1.5-pro-exp-0801",
 	"gemini-1.5-pro-latest",
 	"gemini-2.0-flash-exp",
+	"gemini-2.0-flash-thinking-exp",
+	"gemini-2.0-flash-thinking-exp-1219",
 	"text-moderation-stable",
 }
