@@ -55,6 +55,7 @@ var ChannelBaseURLs = []string{
 	"https://api.302.ai",                        // 51
 	"",                                          // 52
 	"",                                          // 53
+	"https://api.aiguoguo199.com",               // 54
 }
 
 func init() {

@@ -46,7 +46,6 @@ func Relay(c *gin.Context) {
 	ctx := c.Request.Context()
 	modelName := c.GetString(ctxkey.RequestModel)
 	modelId := c.GetString(ctxkey.ModelId)
-	fmt.Println("modelId: ", modelId)
 	relayMode := relaymode.GetByPath(c.Request.URL.Path)
 	if config.DebugEnabled {
 		requestBody, _ := common.GetRequestBody(c)

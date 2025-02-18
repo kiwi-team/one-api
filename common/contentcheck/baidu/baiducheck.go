@@ -61,7 +61,6 @@ type ErrorResponse struct {
 var client *censor.ContentCensorClient
 
 func init() {
-	fmt.Println("baidu content check")
 }
 
 // https://cloud.baidu.com/doc/ANTIPORN/s/2kvuvd2pr#%E8%BF%94%E5%9B%9E%E5%8F%82%E6%95%B0%E8%AF%A6%E6%83%85-1

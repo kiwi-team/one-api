@@ -73,6 +73,7 @@ func (m Message) ParseContent() []MessageContent {
 					})
 				}
 			case ContentTypeAudioURL:
+				// todo 兼容爱果果/panda的请求把 audio_url 转换为 image_url
 				if subObj, ok := contentMap["audio_url"].(map[string]any); ok {
 					contentList = append(contentList, MessageContent{
 						Type: ContentTypeAudioURL,
@@ -82,6 +83,7 @@ func (m Message) ParseContent() []MessageContent {
 					})
 				}
 			case ContentTypeVideoURL:
+				// todo 兼容爱果果的请求把 video_url 转换为 image_url
 				if subObj, ok := contentMap["video_url"].(map[string]any); ok {
 					contentList = append(contentList, MessageContent{
 						Type: ContentTypeVideoURL,
@@ -89,6 +91,7 @@ func (m Message) ParseContent() []MessageContent {
 							Url: subObj["url"].(string),
 						},
 					})
+
 				}
 			}
 		}

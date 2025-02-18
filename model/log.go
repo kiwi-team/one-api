@@ -25,6 +25,8 @@ type Log struct {
 	CompletionTokens int    `json:"completion_tokens" gorm:"default:0"`
 	ChannelId        int    `json:"channel" gorm:"index"`
 	Milliseconds     int    `json:"milliseconds" gorm:"default:0"`
+	Request          string `json:"request" gorm:"type:text"`
+	Response         string `json:"response" gorm:"type:text"`
 }
 
 const (
@@ -34,6 +36,10 @@ const (
 	LogTypeManage
 	LogTypeSystem
 )
+
+var logList = []*Log{}
+var maxLogLen = 100
+var preSaveLogAt int64 = 0
 
 func RecordLog(userId int, logType int, content string) {
 	if logType == LogTypeConsume && !config.LogConsumeEnabled {
@@ -67,11 +73,42 @@ func RecordTopupLog(userId int, content string, quota int) {
 	}
 }
 
-func RecordConsumeLog(ctx context.Context, userId int, channelId int, promptTokens int, completionTokens int, modelName string, tokenName string, quota int64, content string, milliseconds int) {
+// func RecordConsumeLog(ctx context.Context, userId int, channelId int, promptTokens int, completionTokens int, modelName string, tokenName string, quota int64, content string, milliseconds int, requestBody io.Reader, resp *http.Response) {
+func RecordConsumeLog(ctx context.Context, userId int, channelId int, promptTokens int, completionTokens int, modelName string, tokenName string, quota int64, content string, milliseconds int, requestBodyContent string, responseBodyContent string) {
 	logger.Info(ctx, fmt.Sprintf("record consume log: userId=%d, channelId=%d, promptTokens=%d, completionTokens=%d, modelName=%s, tokenName=%s, quota=%d, content=%s", userId, channelId, promptTokens, completionTokens, modelName, tokenName, quota, content))
 	if !config.LogConsumeEnabled {
 		return
 	}
+	/*
+			// copy requestBody and resp get their json string content
+			// Create buffers to store the request and response bodies
+			var requestBodyBuf, responseBodyBuf bytes.Buffer
+
+			// Create TeeReader to copy the request body
+			requestBodyReader := io.TeeReader(requestBody, &requestBodyBuf)
+
+			// Read the request body
+			requestBodyBytes, err := io.ReadAll(requestBodyReader)
+			if err != nil {
+				logger.SysError("failed to read request body: " + err.Error())
+				return
+			}
+			requestBodyContent := string(requestBodyBytes)
+
+			// Create TeeReader to copy the response body
+			responseBodyReader := io.TeeReader(resp.Body, &responseBodyBuf)
+
+			// Read the response body
+			responseBodyBytes, err := io.ReadAll(responseBodyReader)
+			if err != nil {
+				logger.SysError("failed to read response body: " + err.Error())
+				return
+			}
+			responseBodyContent := string(responseBodyBytes)
+
+		// Reset the request and response bodies for further use
+		resp.Body = io.NopCloser(io.MultiReader(&responseBodyBuf, requestBody))
+	*/
 	log := &Log{
 		UserId:           userId,
 		Username:         GetUsernameById(userId),
@@ -85,10 +122,19 @@ func RecordConsumeLog(ctx context.Context, userId int, channelId int, promptToke
 		Quota:            int(quota),
 		ChannelId:        channelId,
 		Milliseconds:     milliseconds,
+		Request:          requestBodyContent,
+		Response:         responseBodyContent,
 	}
-	err := LOG_DB.Create(log).Error
-	if err != nil {
-		logger.Error(ctx, "failed to record log: "+err.Error())
+	logList = append(logList, log)
+	now := helper.GetTimestamp()
+	fmt.Printf("now: %d, preSaveLogAt: %d  requestBodyContent: %s  response: %s\n", now, preSaveLogAt, requestBodyContent, responseBodyContent)
+	if len(logList) >= maxLogLen || (now-preSaveLogAt) > 60 {
+		err := LOG_DB.Create(&logList).Error
+		if err != nil {
+			logger.Error(ctx, "failed to record log: "+err.Error())
+		}
+		logList = logList[:0]
+		preSaveLogAt = now
 	}
 }
 

@@ -71,6 +71,12 @@ func RelayTextHelper(c *gin.Context) *model.ErrorWithStatusCode {
 		return RelayErrorHandler(resp)
 	}
 
+	var responseBodyBuf bytes.Buffer
+
+	// Create TeeReader to copy the response body and assign it back to resp.Body
+	tee := io.TeeReader(resp.Body, &responseBodyBuf)
+	resp.Body = io.NopCloser(tee)
+
 	// do response
 	usage, respErr := adaptor.DoResponse(c, resp, meta)
 	if respErr != nil {
@@ -78,8 +84,15 @@ func RelayTextHelper(c *gin.Context) *model.ErrorWithStatusCode {
 		billing.ReturnPreConsumedQuota(ctx, preConsumedQuota, meta.TokenId)
 		return respErr
 	}
+	// Convert textRequest to JSON string
+	textRequestJSON, _ := json.Marshal(textRequest)
+	requestBodyContent := string(textRequestJSON)
+
+	responseBodyBytes, _ := io.ReadAll(&responseBodyBuf)
+	responseBodyContent := string(responseBodyBytes)
+
 	// post-consume quota
-	go postConsumeQuota(ctx, usage, meta, textRequest, ratio, preConsumedQuota, modelRatio, groupRatio)
+	go postConsumeQuota(ctx, usage, meta, textRequest, ratio, preConsumedQuota, modelRatio, groupRatio, requestBodyContent, responseBodyContent)
 	return nil
 }
 

@@ -13,7 +13,6 @@ var keywords []string
 
 func init() {
 	keywords = strings.Split(strings.ToLower(config.ContentCheckKeyWords), "\n")
-	fmt.Println("keyword content check")
 }
 func (a *Adaptor) CheckContent(content string, channel_id int) (bool, string, error) {
 	input := strings.ToLower(content)

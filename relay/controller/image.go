@@ -175,7 +175,7 @@ func RelayImageHelper(c *gin.Context, relayMode int) *relaymodel.ErrorWithStatus
 	modelRatio := billingratio.GetModelRatio(imageModel, meta.ChannelType)
 	groupRatio := billingratio.GetGroupRatio(meta.Group)
 	ratio := modelRatio * groupRatio
-	userQuota, err := model.CacheGetUserQuota(ctx, meta.UserId)
+	userQuota, _ := model.CacheGetUserQuota(ctx, meta.UserId)
 
 	quota := int64(ratio*imageCostRatio*1000) * int64(imageRequest.N)
 
@@ -193,6 +193,15 @@ func RelayImageHelper(c *gin.Context, relayMode int) *relaymodel.ErrorWithStatus
 		logger.Errorf(ctx, "DoRequest failed: %s", err.Error())
 		return openai.ErrorWrapper(err, "do_request_failed", http.StatusInternalServerError)
 	}
+
+	// Read response body early
+	responseBodyBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to read response body: %s", err.Error())
+		return openai.ErrorWrapper(err, "read_response_failed", http.StatusInternalServerError)
+	}
+	// Create new response with the same body for later use
+	resp.Body = io.NopCloser(bytes.NewBuffer(responseBodyBytes))
 
 	defer func(ctx context.Context) {
 		if resp != nil && resp.StatusCode != http.StatusOK {
@@ -215,12 +224,21 @@ func RelayImageHelper(c *gin.Context, relayMode int) *relaymodel.ErrorWithStatus
 				// 计算耗时
 				milliseconds = int(time.Since(startTime).Milliseconds())
 			}
-			model.RecordConsumeLog(ctx, meta.UserId, meta.ChannelId, 0, 0, imageRequest.Model, tokenName, quota, logContent, milliseconds)
+
+			// Convert textRequest to JSON string
+			textRequestJSON, _ := json.Marshal(imageRequest)
+			requestBodyContent := string(textRequestJSON)
+			responseBodyContent := string(responseBodyBytes)
+
+			model.RecordConsumeLog(ctx, meta.UserId, meta.ChannelId, 0, 0, imageRequest.Model, tokenName, quota, logContent, milliseconds, requestBodyContent, responseBodyContent)
 			model.UpdateUserUsedQuotaAndRequestCount(meta.UserId, quota)
 			channelId := c.GetInt(ctxkey.ChannelId)
 			model.UpdateChannelUsedQuota(channelId, quota)
 		}
 	}(ctx)
+
+	// Create new response with the same body for DoResponse
+	resp.Body = io.NopCloser(bytes.NewBuffer(responseBodyBytes))
 
 	// do response
 	_, respErr := adaptor.DoResponse(c, resp, meta)

@@ -2,6 +2,7 @@ package openai
 
 import (
 	"github.com/songquanpeng/one-api/relay/adaptor/ai360"
+	"github.com/songquanpeng/one-api/relay/adaptor/aiguoguo"
 	"github.com/songquanpeng/one-api/relay/adaptor/baichuan"
 	"github.com/songquanpeng/one-api/relay/adaptor/deepseek"
 	"github.com/songquanpeng/one-api/relay/adaptor/doubao"
@@ -37,6 +38,7 @@ var CompatibleChannels = []int{
 	channeltype.SiliconFlow,
 	channeltype.Friday,
 	channeltype.Panda,
+	channeltype.Aiguoguo,
 }
 
 func GetCompatibleChannelMeta(channelType int) (string, []string) {
@@ -75,6 +77,8 @@ func GetCompatibleChannelMeta(channelType int) (string, []string) {
 		return "panda", panda.ModelList
 	case channeltype.Newaliyun:
 		return "newaliyun", newaliyun.ModelList
+	case channeltype.Aiguoguo:
+		return "aiguoguo", aiguoguo.ModelList
 	default:
 		return "openai", ModelList
 	}

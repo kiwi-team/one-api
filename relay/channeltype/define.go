@@ -55,5 +55,6 @@ const (
 	AI302
 	Midjourney
 	Ailab
+	Aiguoguo
 	Dummy
 )
