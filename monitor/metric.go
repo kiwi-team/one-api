@@ -2,6 +2,7 @@ package monitor
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/songquanpeng/one-api/common/config"
 )
@@ -141,12 +142,12 @@ func metricFailConsumer() {
 		select {
 		case key := <-metricFailChan:
 			disable, successRate := consumeFail(key)
-			if disable {
+			if disable && os.Getenv("LLMTEST_SQL_DSN") != "" {
 				go MetricDisableChannelModel(key, successRate)
 			}
 		case modelId := <-modelFailChan:
 			disable, successRate := consumeModelFail(modelId)
-			if disable {
+			if disable && os.Getenv("LLMTEST_SQL_DSN") != "" {
 				go MetricDisableModel(modelId, successRate)
 			}
 		case channelId := <-channelFailChan:

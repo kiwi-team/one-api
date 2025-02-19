@@ -88,7 +88,7 @@ func main() {
 		logger.SysLog("batch update enabled with interval " + strconv.Itoa(config.BatchUpdateInterval) + "s")
 		model.InitBatchUpdater()
 	}
-	if config.EnableMetric {
+	if config.EnableMetric && os.Getenv("LLMTEST_DB") != "" {
 		logger.SysLog("metric enabled, will disable channel if too much request failed")
 		go monitor.AutoEnable()
 	}
