@@ -3,6 +3,7 @@ package doubao
 // https://console.volcengine.com/ark/region:ark+cn-beijing/model
 
 var ModelList = []string{
+	"doubao-1-5-pro-256k-250115",
 	"Doubao-pro-128k",
 	"Doubao-pro-32k",
 	"Doubao-pro-4k",
