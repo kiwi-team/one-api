@@ -88,6 +88,42 @@ func (a *Adaptor) ConvertRequest(c *gin.Context, relayMode int, request *model.G
 		}
 		request.StreamOptions.IncludeUsage = true
 	}
+	if strings.HasPrefix(request.Model, "gemini") {
+		//  兼容爱果果/panda的请求把 audio_url, video_url 转换为 image_url
+		if a.ChannelType == channeltype.Aiguoguo || a.ChannelType == channeltype.Panda {
+			newMessages := make([]model.Message, 0, len(request.Messages))
+			for _, message := range request.Messages {
+				newContentArr := make([]model.MessageContent, 0)
+				arr := message.ParseContent()
+				for _, content := range arr {
+					var newContent model.MessageContent
+					switch content.Type {
+					case model.ContentTypeAudioURL:
+						newContent = model.MessageContent{
+							Type: model.ContentTypeImageURL,
+							ImageURL: &model.ImageURL{
+								Url: content.AudioURL.Url,
+							},
+						}
+					case model.ContentTypeVideoURL:
+						newContent = model.MessageContent{
+							Type: model.ContentTypeImageURL,
+							ImageURL: &model.ImageURL{
+								Url: content.VideoURL.Url,
+							},
+						}
+					default:
+						newContent = content
+					}
+					newContentArr = append(newContentArr, newContent)
+				}
+				newMessage := message
+				newMessage.Content = newContentArr
+				newMessages = append(newMessages, newMessage)
+			}
+			request.Messages = newMessages
+		}
+	}
 	return request, nil
 }
 
