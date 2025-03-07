@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html/template"
 	"log"
+	"math/rand"
 	"net"
 	"os/exec"
 	"runtime"
@@ -152,4 +153,16 @@ func LastNChars(s string, n int) string {
 
 	// 返回最后 n 个字符
 	return string(runeSlice[start:])
+}
+
+func GetRandomInt(max int) int {
+	return rand.Intn(max)
+}
+
+func StringToInt(str string) int {
+	num, err := strconv.Atoi(str)
+	if err != nil {
+		return 0
+	}
+	return num
 }

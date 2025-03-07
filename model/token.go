@@ -3,6 +3,7 @@ package model
 import (
 	"errors"
 	"fmt"
+
 	"github.com/songquanpeng/one-api/common"
 	"github.com/songquanpeng/one-api/common/config"
 	"github.com/songquanpeng/one-api/common/helper"
@@ -32,6 +33,7 @@ type Token struct {
 	UsedQuota      int64   `json:"used_quota" gorm:"bigint;default:0"` // used quota
 	Models         *string `json:"models" gorm:"type:text"`            // allowed models
 	Subnet         *string `json:"subnet" gorm:"default:''"`           // allowed subnet
+	ChannelIds     *string `json:"channel_ids" gorm:"type:text"`       // channel ids
 }
 
 func GetAllUserTokens(userId int, startIdx int, num int, order string) ([]*Token, error) {
@@ -122,15 +124,13 @@ func GetTokenById(id int) (*Token, error) {
 }
 
 func (t *Token) Insert() error {
-	var err error
-	err = DB.Create(t).Error
+	err := DB.Create(t).Error
 	return err
 }
 
 // Update Make sure your token's fields is completed, because this will update non-zero values
 func (t *Token) Update() error {
-	var err error
-	err = DB.Model(t).Select("name", "status", "expired_time", "remain_quota", "unlimited_quota", "models", "subnet").Updates(t).Error
+	err := DB.Model(t).Select("name", "status", "expired_time", "remain_quota", "unlimited_quota", "models", "subnet", "channel_ids").Updates(t).Error
 	return err
 }
 
@@ -140,8 +140,7 @@ func (t *Token) SelectUpdate() error {
 }
 
 func (t *Token) Delete() error {
-	var err error
-	err = DB.Delete(t).Error
+	err := DB.Delete(t).Error
 	return err
 }
 

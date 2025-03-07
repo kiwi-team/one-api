@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"fmt"
+	"math/rand"
 	"net/http"
 	"strings"
 
@@ -135,6 +136,10 @@ func TokenAuth() func(c *gin.Context) {
 		c.Set(ctxkey.TokenId, token.Id)
 		c.Set(ctxkey.TokenName, token.Name)
 		c.Set(ctxkey.ModelId, modelId)
+		c.Set(ctxkey.ChannelIds, "")
+		if token.ChannelIds != nil && *token.ChannelIds != "" {
+			c.Set(ctxkey.ChannelIds, *token.ChannelIds) // 记录绑定的渠道
+		}
 		if len(parts) > 1 {
 			if model.IsAdmin(token.UserId) {
 				c.Set(ctxkey.SpecificChannelId, parts[1])
@@ -147,6 +152,15 @@ func TokenAuth() func(c *gin.Context) {
 		// set channel id for proxy relay
 		if channelId := c.Param("channelid"); channelId != "" {
 			c.Set(ctxkey.SpecificChannelId, channelId)
+		}
+
+		// 随机选择一个绑定的渠道
+		if token.ChannelIds != nil && *token.ChannelIds != "" {
+			channelIds := strings.Split(*token.ChannelIds, ",")
+			if len(channelIds) > 0 {
+				randIndex := rand.Intn(len(channelIds))
+				c.Set(ctxkey.SpecificChannelId, channelIds[randIndex])
+			}
 		}
 
 		c.Next()

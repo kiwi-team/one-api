@@ -3,6 +3,8 @@ package panda
 // https://api.panda-v.com/pricing
 
 var ModelList = []string{
+	"o3-mini",
+	"o3-mini-2025-01-31",
 	"grok-3-all",
 	"o1-all",
 	"o1-mini-all",

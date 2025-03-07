@@ -38,7 +38,7 @@ const (
 )
 
 var logList = []*Log{}
-var maxLogLen = 100
+var maxLogLen = 10
 var preSaveLogAt int64 = 0
 
 func RecordLog(userId int, logType int, content string) {

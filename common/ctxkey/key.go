@@ -21,4 +21,5 @@ const (
 	BaseURL           = "base_url"
 	AvailableModels   = "available_models"
 	KeyRequestBody    = "key_request_body"
+	ChannelIds        = "channel_ids"
 )

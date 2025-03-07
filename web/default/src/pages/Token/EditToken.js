@@ -17,9 +17,10 @@ const EditToken = () => {
     unlimited_quota: false,
     models: [],
     subnet: "",
+    channel_ids:"",
   };
   const [inputs, setInputs] = useState(originInputs);
-  const { name, remain_quota, expired_time, unlimited_quota } = inputs;
+  const { name, remain_quota, expired_time, unlimited_quota,channel_ids } = inputs;
   const navigate = useNavigate();
   const handleInputChange = (e, { name, value }) => {
     setInputs((inputs) => ({ ...inputs, [name]: value }));
@@ -166,6 +167,16 @@ const EditToken = () => {
           </Form.Field>
           <Form.Field>
             <Form.Input
+              label={`渠道限制`}
+              name='channel_ids'
+              placeholder={'请输入绑定的渠道id，多个id用英文逗号分隔,如果不输入，所有的渠道都可以使用'}
+              value={channel_ids}
+              onChange={handleInputChange}
+              type='string'
+            />
+          </Form.Field>
+          <Form.Field>
+            <Form.Input
               label='过期时间'
               name='expired_time'
               placeholder={'请输入过期时间，格式为 yyyy-MM-dd HH:mm:ss，-1 表示无限制'}
@@ -208,6 +219,7 @@ const EditToken = () => {
           <Button type={'button'} onClick={() => {
             setUnlimitedQuota();
           }}>{unlimited_quota ? '取消无限额度' : '设为无限额度'}</Button>
+         
           <Button floated='right' positive onClick={submit}>提交</Button>
           <Button floated='right' onClick={handleCancel}>取消</Button>
         </Form>
