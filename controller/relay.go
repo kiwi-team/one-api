@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/songquanpeng/one-api/common"
@@ -79,31 +78,14 @@ func Relay(c *gin.Context) {
 	channel1 := &dbmodel.Channel{}
 	for i := retryTimes; i > 0; i-- {
 		if specialChannelId != "" {
-			arr := []string{specialChannelId}
-			if channelIds != "" {
-				arr = strings.Split(channelIds, ",")
-			}
-			// Remove lastFailedChannelId from arr and get a random element
-			var validChannels []string
-			for _, id := range arr {
-				if id != fmt.Sprint(lastFailedChannelId) {
-					validChannels = append(validChannels, id)
-				}
-			}
-			if len(validChannels) == 0 {
-				// 对于绑定渠道的重试，只能从绑定的渠道中随机选择,也有可能是上次失败的渠道
-				validChannels = append(validChannels, fmt.Sprint(lastFailedChannelId))
-			}
-			selectedId := validChannels[helper.GetRandomInt(len(validChannels))]
-			fmt.Printf("selectedId:%v, channelIds:%v  lastFailedChannelId:%v", selectedId, channelIds, lastFailedChannelId)
-			channel, err := dbmodel.GetChannelById(helper.StringToInt(selectedId), true)
+			channel, err := dbmodel.GetChannelById(helper.StringToInt(specialChannelId), true)
 			if err != nil {
 				logger.Errorf(ctx, "CacheGetChannel failed: %+v", err)
 				break
 			}
 			channel1 = channel
 		} else {
-			channel, err := dbmodel.CacheGetRandomSatisfiedChannel(group, originalModel, i != retryTimes)
+			channel, err := dbmodel.CacheGetRandomSatisfiedChannel(group, originalModel, i != retryTimes, channelIds)
 			if err != nil {
 				logger.Errorf(ctx, "CacheGetRandomSatisfiedChannel failed: %+v", err)
 				break

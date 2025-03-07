@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -230,13 +231,23 @@ func SyncChannelCacheNow() {
 	InitChannelCache()
 }
 
-func CacheGetRandomSatisfiedChannel(group string, model string, ignoreFirstPriority bool) (*Channel, error) {
+func CacheGetRandomSatisfiedChannel(group string, model string, ignoreFirstPriority bool, channelIds string) (*Channel, error) {
 	if !config.MemoryCacheEnabled {
 		return GetRandomSatisfiedChannel(group, model, ignoreFirstPriority)
 	}
 	channelSyncLock.RLock()
 	defer channelSyncLock.RUnlock()
-	channels := group2model2channels[group][model]
+	channelList := group2model2channels[group][model]
+	channels := make([]*Channel, 0)
+	arr := []string{}
+	if channelIds != "" {
+		arr = strings.Split(channelIds, ",")
+	}
+	for _, channel := range channelList {
+		if slices.Contains(arr, strconv.Itoa(channel.Id)) {
+			channels = append(channels, channel)
+		}
+	}
 	if len(channels) == 0 {
 		return nil, errors.New("channel not found")
 	}
