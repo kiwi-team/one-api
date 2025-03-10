@@ -244,7 +244,11 @@ func CacheGetRandomSatisfiedChannel(group string, model string, ignoreFirstPrior
 		arr = strings.Split(channelIds, ",")
 	}
 	for _, channel := range channelList {
-		if slices.Contains(arr, strconv.Itoa(channel.Id)) {
+		if len(arr) > 0 {
+			if slices.Contains(arr, strconv.Itoa(channel.Id)) {
+				channels = append(channels, channel)
+			}
+		} else {
 			channels = append(channels, channel)
 		}
 	}
