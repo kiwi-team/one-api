@@ -233,7 +233,7 @@ func SyncChannelCacheNow() {
 
 func CacheGetRandomSatisfiedChannel(group string, model string, ignoreFirstPriority bool, channelIds string) (*Channel, error) {
 	if !config.MemoryCacheEnabled {
-		return GetRandomSatisfiedChannel(group, model, ignoreFirstPriority)
+		return GetRandomSatisfiedChannel(group, model, ignoreFirstPriority, channelIds)
 	}
 	channelSyncLock.RLock()
 	defer channelSyncLock.RUnlock()
