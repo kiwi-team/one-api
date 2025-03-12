@@ -6,6 +6,8 @@ var ModelList = []string{
 	"o3-mini",
 	"o3-mini-2025-01-31",
 	"grok-3-all",
+	"grok-3-deepsearch-all",
+	"grok-3-reasoner-all",
 	"o1-all",
 	"o1-mini-all",
 	"o1-preview-all",
