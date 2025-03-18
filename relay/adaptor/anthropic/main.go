@@ -63,6 +63,12 @@ func ConvertRequest(textRequest model.GeneralOpenAIRequest) *Request {
 		Stream:      textRequest.Stream,
 		Tools:       claudeTools,
 	}
+	if textRequest.Thinking != nil {
+		claudeRequest.Thinking = &Thinking{
+			Type:         textRequest.Thinking.Type,
+			BudgetTokens: textRequest.Thinking.BudgetTokens,
+		}
+	}
 	if len(claudeTools) > 0 {
 		claudeToolChoice := struct {
 			Type string `json:"type"`
@@ -209,9 +215,16 @@ func StreamResponseClaude2OpenAI(claudeResponse *StreamResponse) (*openai.ChatCo
 }
 
 func ResponseClaude2OpenAI(claudeResponse *Response) *openai.TextResponse {
-	var responseText string
+	var responseTextBuilder strings.Builder
+	var reasoningContentBuilder strings.Builder
 	if len(claudeResponse.Content) > 0 {
-		responseText = claudeResponse.Content[0].Text
+		for _, v := range claudeResponse.Content {
+			if v.Type == "text" {
+				responseTextBuilder.WriteString(v.Text)
+			} else if v.Type == "thinking" {
+				reasoningContentBuilder.WriteString(v.Thinking)
+			}
+		}
 	}
 	tools := make([]model.Tool, 0)
 	for _, v := range claudeResponse.Content {
@@ -230,10 +243,11 @@ func ResponseClaude2OpenAI(claudeResponse *Response) *openai.TextResponse {
 	choice := openai.TextResponseChoice{
 		Index: 0,
 		Message: model.Message{
-			Role:      "assistant",
-			Content:   responseText,
-			Name:      nil,
-			ToolCalls: tools,
+			Role:             "assistant",
+			Content:          responseTextBuilder.String(),
+			ReasoningContent: reasoningContentBuilder.String(),
+			Name:             nil,
+			ToolCalls:        tools,
 		},
 		FinishReason: stopReasonClaude2OpenAI(claudeResponse.StopReason),
 	}

@@ -22,6 +22,10 @@ type Content struct {
 	Input     any    `json:"input,omitempty"`
 	Content   string `json:"content,omitempty"`
 	ToolUseId string `json:"tool_use_id,omitempty"`
+	// thinking
+	Thinking  string `json:"thinking,omitempty"`
+	Data      string `json:"data,omitempty"`
+	Signature string `json:"signature,omitempty"`
 }
 
 type Message struct {
@@ -41,6 +45,11 @@ type InputSchema struct {
 	Required   any    `json:"required,omitempty"`
 }
 
+type Thinking struct {
+	Type         string `json:"type,omitempty"`
+	BudgetTokens int    `json:"budget_tokens,omitempty"`
+}
+
 type Request struct {
 	Model         string    `json:"model"`
 	Messages      []Message `json:"messages"`
@@ -54,6 +63,7 @@ type Request struct {
 	Tools         []Tool    `json:"tools,omitempty"`
 	ToolChoice    any       `json:"tool_choice,omitempty"`
 	//Metadata    `json:"metadata,omitempty"`
+	Thinking *Thinking `json:"thinking,omitempty"`
 }
 
 type Usage struct {

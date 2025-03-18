@@ -21,37 +21,43 @@ type StreamOptions struct {
 	IncludeUsage bool `json:"include_usage,omitempty"`
 }
 
+type AnthropicThinking struct {
+	Type         string `json:"type,omitempty"`
+	BudgetTokens int    `json:"budget_tokens,omitempty"`
+}
+
 type GeneralOpenAIRequest struct {
-	Messages            []Message `json:"messages,omitempty"`
-	Model               string    `json:"model,omitempty"`
-	Modalities          []string  `json:"modalities,omitempty"`
-	Audio               *Audio    `json:"audio,omitempty"`
-	FrequencyPenalty    float64   `json:"frequency_penalty,omitempty"`
-	MaxTokens           int       `json:"max_tokens,omitempty"`
-	MaxCompletionTokens int       `json:"max_completion_tokens,omitempty"`
-	//ReasoningEffort     string          `json:"reasoning_effort,omitempty"`
-	N               int             `json:"n,omitempty"`
-	PresencePenalty float64         `json:"presence_penalty,omitempty"`
-	ResponseFormat  *ResponseFormat `json:"response_format,omitempty"`
-	Seed            float64         `json:"seed,omitempty"`
-	Stop            any             `json:"stop,omitempty"`
-	Stream          bool            `json:"stream,omitempty"`
-	StreamOptions   *StreamOptions  `json:"stream_options,omitempty"`
-	Temperature     float64         `json:"temperature,omitempty"`
-	TopP            float64         `json:"top_p,omitempty"`
-	TopK            int             `json:"top_k,omitempty"`
-	Tools           []Tool          `json:"tools,omitempty"`
-	ToolChoice      any             `json:"tool_choice,omitempty"`
-	FunctionCall    any             `json:"function_call,omitempty"`
-	Functions       any             `json:"functions,omitempty"`
-	User            string          `json:"user,omitempty"`
-	Prompt          any             `json:"prompt,omitempty"`
-	Input           any             `json:"input,omitempty"`
-	EncodingFormat  string          `json:"encoding_format,omitempty"`
-	Dimensions      int             `json:"dimensions,omitempty"`
-	Instruction     string          `json:"instruction,omitempty"`
-	Size            string          `json:"size,omitempty"`
-	NumCtx          int             `json:"num_ctx,omitempty"`
+	Messages            []Message          `json:"messages,omitempty"`
+	Model               string             `json:"model,omitempty"`
+	Modalities          []string           `json:"modalities,omitempty"`
+	Audio               *Audio             `json:"audio,omitempty"`
+	FrequencyPenalty    float64            `json:"frequency_penalty,omitempty"`
+	MaxTokens           int                `json:"max_tokens,omitempty"`
+	MaxCompletionTokens int                `json:"max_completion_tokens,omitempty"`
+	ReasoningEffort     string             `json:"reasoning_effort,omitempty"`
+	N                   int                `json:"n,omitempty"`
+	PresencePenalty     float64            `json:"presence_penalty,omitempty"`
+	ResponseFormat      *ResponseFormat    `json:"response_format,omitempty"`
+	Seed                float64            `json:"seed,omitempty"`
+	Stop                any                `json:"stop,omitempty"`
+	Stream              bool               `json:"stream,omitempty"`
+	StreamOptions       *StreamOptions     `json:"stream_options,omitempty"`
+	Temperature         float64            `json:"temperature,omitempty"`
+	TopP                float64            `json:"top_p,omitempty"`
+	TopK                int                `json:"top_k,omitempty"`
+	Tools               []Tool             `json:"tools,omitempty"`
+	ToolChoice          any                `json:"tool_choice,omitempty"`
+	FunctionCall        any                `json:"function_call,omitempty"`
+	Functions           any                `json:"functions,omitempty"`
+	User                string             `json:"user,omitempty"`
+	Prompt              any                `json:"prompt,omitempty"`
+	Input               any                `json:"input,omitempty"`
+	EncodingFormat      string             `json:"encoding_format,omitempty"`
+	Dimensions          int                `json:"dimensions,omitempty"`
+	Instruction         string             `json:"instruction,omitempty"`
+	Size                string             `json:"size,omitempty"`
+	NumCtx              int                `json:"num_ctx,omitempty"`
+	Thinking            *AnthropicThinking `json:"thinking,omitempty"`
 }
 
 func (r GeneralOpenAIRequest) ParseInput() []string {
