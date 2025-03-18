@@ -9,6 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/songquanpeng/one-api/relay/adaptor"
+	"github.com/songquanpeng/one-api/relay/adaptor/baidu2"
 	"github.com/songquanpeng/one-api/relay/adaptor/doubao"
 	"github.com/songquanpeng/one-api/relay/adaptor/friday"
 	"github.com/songquanpeng/one-api/relay/adaptor/minimax"
@@ -58,6 +59,8 @@ func (a *Adaptor) GetRequestURL(meta *meta.Meta) (string, error) {
 		return friday.GetRequestURL(meta)
 	case channeltype.Newaliyun:
 		return newaliyun.GetRequestURL(meta)
+	case channeltype.Baidu2:
+		return baidu2.GetRequestURL(meta)
 	default:
 		return GetFullRequestURL(meta.BaseURL, meta.RequestURLPath, meta.ChannelType), nil
 	}
@@ -87,6 +90,9 @@ func (a *Adaptor) ConvertRequest(c *gin.Context, relayMode int, request *model.G
 			request.StreamOptions = &model.StreamOptions{}
 		}
 		request.StreamOptions.IncludeUsage = true
+	}
+	if a.ChannelType == channeltype.Baidu2 {
+		request.Model = strings.ToLower(request.Model)
 	}
 	if strings.HasPrefix(request.Model, "gemini") {
 		//  兼容爱果果/panda的请求把 audio_url, video_url 转换为 image_url

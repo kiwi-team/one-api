@@ -4,6 +4,7 @@ import (
 	"github.com/songquanpeng/one-api/relay/adaptor/ai360"
 	"github.com/songquanpeng/one-api/relay/adaptor/aiguoguo"
 	"github.com/songquanpeng/one-api/relay/adaptor/baichuan"
+	"github.com/songquanpeng/one-api/relay/adaptor/baidu2"
 	"github.com/songquanpeng/one-api/relay/adaptor/deepseek"
 	"github.com/songquanpeng/one-api/relay/adaptor/doubao"
 	"github.com/songquanpeng/one-api/relay/adaptor/friday"
@@ -39,6 +40,7 @@ var CompatibleChannels = []int{
 	channeltype.Friday,
 	channeltype.Panda,
 	channeltype.Aiguoguo,
+	channeltype.Baidu2,
 }
 
 func GetCompatibleChannelMeta(channelType int) (string, []string) {
@@ -79,6 +81,8 @@ func GetCompatibleChannelMeta(channelType int) (string, []string) {
 		return "newaliyun", newaliyun.ModelList
 	case channeltype.Aiguoguo:
 		return "aiguoguo", aiguoguo.ModelList
+	case channeltype.Baidu2:
+		return "baidu2", baidu2.ModelList
 	default:
 		return "openai", ModelList
 	}

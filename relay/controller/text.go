@@ -99,13 +99,14 @@ func RelayTextHelper(c *gin.Context) *model.ErrorWithStatusCode {
 func getRequestBody(c *gin.Context, meta *meta.Meta, textRequest *model.GeneralOpenAIRequest, adaptor adaptor.Adaptor) (io.Reader, error) {
 	if meta.APIType == apitype.OpenAI && meta.OriginModelName == meta.ActualModelName && meta.ChannelType != channeltype.Baichuan {
 		// no need to convert request for openai
-		if meta.ChannelType != channeltype.Aiguoguo && meta.ChannelType != channeltype.Panda {
+		if meta.ChannelType != channeltype.Baidu2 && meta.ChannelType != channeltype.Aiguoguo && meta.ChannelType != channeltype.Panda {
 			return c.Request.Body, nil
 		}
 	}
 
 	// get request body
 	var requestBody io.Reader
+
 	convertedRequest, err := adaptor.ConvertRequest(c, meta.Mode, textRequest)
 	if err != nil {
 		logger.Debugf(c.Request.Context(), "converted request failed: %s\n", err.Error())

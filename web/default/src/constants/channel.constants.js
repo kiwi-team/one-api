@@ -40,6 +40,7 @@ export const CHANNEL_OPTIONS = [
   { key: 52, text: 'midjourney', value: 52, color: 'blue' },
   { key: 53, text: 'ailab', value: 53, color: 'blue' },
   { key: 54, text: 'aiguoguo', value: 54, color: 'green' },
+  { key: 55, text: 'baidu2', value: 55, color: 'blue' },
   { key: 8, text: '自定义渠道', value: 8, color: 'pink' },
   { key: 22, text: '知识库：FastGPT', value: 22, color: 'blue' },
   { key: 21, text: '知识库：AI Proxy', value: 21, color: 'purple' },

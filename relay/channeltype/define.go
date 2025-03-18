@@ -56,5 +56,6 @@ const (
 	Midjourney
 	Ailab
 	Aiguoguo
+	Baidu2
 	Dummy
 )

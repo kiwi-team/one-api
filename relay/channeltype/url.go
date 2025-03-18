@@ -56,6 +56,7 @@ var ChannelBaseURLs = []string{
 	"",                                          // 52
 	"",                                          // 53
 	"https://api0.aiguoguo199.com",              // 54
+	"https://qianfan.baidubce.com",              // 55
 }
 
 func init() {
