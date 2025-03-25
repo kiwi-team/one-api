@@ -2,6 +2,7 @@ package openai
 
 var ModelList = []string{
 	"gpt-4.5-preview-2025-02-27",
+	"o1-pro",
 	"gpt-3.5-turbo", "gpt-3.5-turbo-0301", "gpt-3.5-turbo-0613", "gpt-3.5-turbo-1106", "gpt-3.5-turbo-0125",
 	"gpt-3.5-turbo-16k", "gpt-3.5-turbo-16k-0613",
 	"gpt-3.5-turbo-instruct",
@@ -20,6 +21,7 @@ var ModelList = []string{
 	"davinci-002", "babbage-002",
 	"dall-e-2", "dall-e-3",
 	"whisper-1",
+	"gpt-4o-mini-tts",
 	"tts-1", "tts-1-1106", "tts-1-hd", "tts-1-hd-1106",
 	"gpt-4o-mini-realtime-preview-2024-12-17",
 	"gpt-4o-mini-realtime-preview",

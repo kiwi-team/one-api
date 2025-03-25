@@ -4,6 +4,8 @@ type Usage struct {
 	PromptTokens     int `json:"prompt_tokens"`
 	CompletionTokens int `json:"completion_tokens"`
 	TotalTokens      int `json:"total_tokens"`
+	InputTokens      int `json:"input_tokens,omitempty" default:"0"`
+	OutputTokens     int `json:"output_tokens,omitempty" default:"0"`
 }
 
 type Error struct {
