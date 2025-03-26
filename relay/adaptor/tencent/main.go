@@ -8,12 +8,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/songquanpeng/one-api/common/render"
 	"io"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/songquanpeng/one-api/common/render"
 
 	"github.com/gin-gonic/gin"
 	"github.com/songquanpeng/one-api/common"
@@ -30,10 +31,40 @@ func ConvertRequest(request model.GeneralOpenAIRequest) *ChatRequest {
 	messages := make([]*Message, 0, len(request.Messages))
 	for i := 0; i < len(request.Messages); i++ {
 		message := request.Messages[i]
+		contentList := message.ParseContent()
+		if len(contentList) == 1 && contentList[0].Type == model.ContentTypeText {
+			messages = append(messages, &Message{
+				Content: contentList[0].Text,
+				Role:    message.Role,
+			})
+			continue
+		}
+		newContentList := make([]Content, 0, len(contentList))
+		for _, item := range contentList {
+			if item.Type == model.ContentTypeText {
+				newContentList = append(newContentList, Content{
+					Type: "text",
+					Text: item.Text,
+				})
+			} else if item.Type == model.ContentTypeImageURL {
+				newContentList = append(newContentList, Content{
+					Type: "image_url",
+					ImageUrl: &ImageURL{
+						Url: item.ImageURL.Url,
+					},
+				})
+			}
+		}
 		messages = append(messages, &Message{
-			Content: message.StringContent(),
-			Role:    message.Role,
+			Contents: newContentList, // Messages 中 Contents 字段仅 hunyuan-vision、hunyuan-turbo-vision、hunyuan-standard-vision、hunyuan-lite-vision、hunyuan-vision-edu 模型支持"
+			Role:     message.Role,
 		})
+		/*
+			messages = append(messages, &Message{
+				Content: message.StringContent(),
+				Role:    message.Role,
+			})
+		*/
 	}
 	return &ChatRequest{
 		Model:       &request.Model,
@@ -46,6 +77,7 @@ func ConvertRequest(request model.GeneralOpenAIRequest) *ChatRequest {
 
 func responseTencent2OpenAI(response *ChatResponse) *openai.TextResponse {
 	fullTextResponse := openai.TextResponse{
+		Id:      response.Id,
 		Object:  "chat.completion",
 		Created: helper.GetTimestamp(),
 		Usage: model.Usage{
@@ -145,6 +177,7 @@ func Handler(c *gin.Context, resp *http.Response) (*model.ErrorWithStatusCode, *
 	}
 	err = json.Unmarshal(responseBody, &responseP)
 	if err != nil {
+		fmt.Printf("\n response unmarshal_response_body_failed: %v \n", string(responseBody))
 		return openai.ErrorWrapper(err, "unmarshal_response_body_failed", http.StatusInternalServerError), nil
 	}
 	TencentResponse = responseP.Response

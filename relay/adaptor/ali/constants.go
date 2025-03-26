@@ -1,6 +1,7 @@
 package ali
 
 var ModelList = []string{
+	"qwq-32b",
 	"qwen-max-2025-01-25",
 	"qwen-max-latest",
 	"qwen-turbo", "qwen-plus", "qwen-max", "qwen-max-longcontext",

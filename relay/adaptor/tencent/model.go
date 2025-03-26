@@ -1,8 +1,18 @@
 package tencent
 
 type Message struct {
-	Role    string `json:"Role"`
-	Content string `json:"Content"`
+	Role     string    `json:"Role"`
+	Content  string    `json:"Content,omitempty"`
+	Contents []Content `json:"Contents,omitempty"`
+}
+
+type Content struct {
+	Type     string    `json:"Type"` // 参数值可选范围：[text", "image_url"]
+	Text     string    `json:"Text,omitempty"`
+	ImageUrl *ImageURL `json:"ImageUrl,omitempty"`
+}
+type ImageURL struct {
+	Url string `json:"Url,omitempty"`
 }
 
 type ChatRequest struct {

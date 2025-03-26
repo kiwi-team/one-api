@@ -1,9 +1,25 @@
 package tencent
 
 var ModelList = []string{
+	"hunyuan-pro",
 	"hunyuan-lite",
 	"hunyuan-standard",
 	"hunyuan-standard-256K",
-	"hunyuan-pro",
+	"hunyuan-code",
+	"hunyuan-role",
+	"hunyuan-functioncall",
 	"hunyuan-vision",
+	"hunyuan-turbo",
+	"hunyuan-turbo-latest",
+	"hunyuan-turbo-20241223",
+	"hunyuan-turbo-20241120",
+	"hunyuan-large",
+	"hunyuan-large-longcontext",
+	"hunyuan-turbo-vision",
+	"hunyuan-standard-vision",
+	"hunyuan-lite-vision",
+	"hunyuan-turbos-20250226",
+	"hunyuan-turbos-latest",
+	"hunyuan-t1-20250321",
+	"hunyuan-t1-latest",
 }

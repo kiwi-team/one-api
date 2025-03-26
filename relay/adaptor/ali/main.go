@@ -3,11 +3,13 @@ package ali
 import (
 	"bufio"
 	"encoding/json"
-	"github.com/songquanpeng/one-api/common/ctxkey"
-	"github.com/songquanpeng/one-api/common/render"
 	"io"
 	"net/http"
 	"strings"
+
+	"github.com/google/uuid"
+	"github.com/songquanpeng/one-api/common/ctxkey"
+	"github.com/songquanpeng/one-api/common/render"
 
 	"github.com/gin-gonic/gin"
 	"github.com/songquanpeng/one-api/common"
@@ -226,6 +228,89 @@ func StreamHandler(c *gin.Context, resp *http.Response) (*model.ErrorWithStatusC
 	if err != nil {
 		return openai.ErrorWrapper(err, "close_response_body_failed", http.StatusInternalServerError), nil
 	}
+	return nil, &usage
+}
+
+// qwq-32b 流式处理，最后返回一个完整的 response
+func StreamHandlerQwq32b(c *gin.Context, resp *http.Response) (*model.ErrorWithStatusCode, *model.Usage) {
+	var usage model.Usage
+	scanner := bufio.NewScanner(resp.Body)
+	scanner.Split(func(data []byte, atEOF bool) (advance int, token []byte, err error) {
+		if atEOF && len(data) == 0 {
+			return 0, nil, nil
+		}
+		if i := strings.Index(string(data), "\n"); i >= 0 {
+			return i + 1, data[0:i], nil
+		}
+		if atEOF {
+			return len(data), data, nil
+		}
+		return 0, nil, nil
+	})
+	content := ""
+	reason := ""
+
+	for scanner.Scan() {
+		data := scanner.Text()
+		if len(data) < 5 || data[:5] != "data:" {
+			continue
+		}
+		data = data[5:]
+
+		var aliResponse ChatResponse
+		err := json.Unmarshal([]byte(data), &aliResponse)
+		if err != nil {
+			logger.SysError("error unmarshalling stream response: " + err.Error())
+			continue
+		}
+		if aliResponse.Usage.OutputTokens != 0 {
+			usage.PromptTokens = aliResponse.Usage.InputTokens
+			usage.CompletionTokens = aliResponse.Usage.OutputTokens
+			usage.TotalTokens = aliResponse.Usage.InputTokens + aliResponse.Usage.OutputTokens
+		}
+		if len(aliResponse.Output.Choices) > 0 {
+			if msgContent, ok := aliResponse.Output.Choices[0].Message.Content.(string); ok {
+				content += msgContent
+			}
+			if msgReason, ok := aliResponse.Output.Choices[0].Message.ReasoningContent.(string); ok {
+				reason += msgReason
+			}
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		logger.SysError("error reading stream: " + err.Error())
+	}
+
+	fullTextResponse := openai.TextResponse{
+		Id:      uuid.New().String(),
+		Object:  "chat.completion",
+		Created: helper.GetTimestamp(),
+		Choices: []openai.TextResponseChoice{
+			{
+				Index: 0,
+				Message: model.Message{
+					Role:             "assistant",
+					Content:          content,
+					ReasoningContent: reason,
+				},
+				FinishReason: "stop",
+			},
+		},
+		Usage: model.Usage{
+			PromptTokens:     usage.PromptTokens,
+			CompletionTokens: usage.CompletionTokens,
+			TotalTokens:      usage.TotalTokens,
+		},
+	}
+	fullTextResponse.Model = "qwq-32b"
+	jsonResponse, err := json.Marshal(fullTextResponse)
+	if err != nil {
+		return openai.ErrorWrapper(err, "marshal_response_body_failed", http.StatusInternalServerError), nil
+	}
+	c.Writer.Header().Set("Content-Type", "application/json")
+	c.Writer.WriteHeader(resp.StatusCode)
+	c.Writer.Write(jsonResponse)
 	return nil, &usage
 }
 
