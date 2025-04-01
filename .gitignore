@@ -10,5 +10,11 @@ data
 /web/node_modules
 cmd.md
 .env
+<<<<<<< HEAD
 .air.toml
 tmp
+=======
+/one-api
+temp
+.DS_Store
+>>>>>>> 8df4a2670b98266bd287c698243fff327d9748cf
