@@ -22,6 +22,7 @@ import (
 	"github.com/songquanpeng/one-api/relay/adaptor/openai"
 	"github.com/songquanpeng/one-api/relay/adaptor/palm"
 	"github.com/songquanpeng/one-api/relay/adaptor/proxy"
+	"github.com/songquanpeng/one-api/relay/adaptor/replicate"
 	"github.com/songquanpeng/one-api/relay/adaptor/tencent"
 	"github.com/songquanpeng/one-api/relay/adaptor/vertexai"
 	"github.com/songquanpeng/one-api/relay/adaptor/xunfei"
@@ -79,6 +80,8 @@ func GetAdaptor(apiType int) adaptor.Adaptor {
 		return &midjourney.Adaptor{}
 	case apitype.Ailab:
 		return &ailab.Adaptor{}
+	case apitype.Replicate:
+		return &replicate.Adaptor{}
 	}
 	return nil
 }

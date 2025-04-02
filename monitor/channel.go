@@ -35,7 +35,16 @@ func DisableChannel(channelId int, channelName string, reason string) {
 	model.UpdateChannelStatusById(channelId, model.ChannelStatusAutoDisabled)
 	logger.SysLog(fmt.Sprintf("channel #%d has been disabled: %s", channelId, reason))
 	subject := fmt.Sprintf("渠道「%s」（#%d）已被禁用", channelName, channelId)
-	content := fmt.Sprintf("渠道「%s」（#%d）已被禁用，原因：%s", channelName, channelId, reason)
+	//content := fmt.Sprintf("渠道「%s」（#%d）已被禁用，原因：%s", channelName, channelId, reason)
+	content := message.EmailTemplate(
+		subject,
+		fmt.Sprintf(`
+			<p>您好！</p>
+			<p>渠道「<strong>%s</strong>」（#%d）已被禁用。</p>
+			<p>禁用原因：</p>
+			<p style="background-color: #f8f8f8; padding: 10px; border-radius: 4px;">%s</p>
+		`, channelName, channelId, reason),
+	)
 	notifyRootUser(subject, subject+"\n<br>\n"+content)
 }
 
@@ -133,6 +142,13 @@ func EnableChannel(channelId int, channelName string) {
 	model.UpdateChannelStatusById(channelId, model.ChannelStatusEnabled)
 	logger.SysLog(fmt.Sprintf("channel #%d has been enabled", channelId))
 	subject := fmt.Sprintf("渠道「%s」（#%d）已被启用", channelName, channelId)
-	content := fmt.Sprintf("渠道「%s」（#%d）已被启用", channelName, channelId)
+	content := message.EmailTemplate(
+		subject,
+		fmt.Sprintf(`
+			<p>您好！</p>
+			<p>渠道「<strong>%s</strong>」（#%d）已被重新启用。</p>
+			<p>您现在可以继续使用该渠道了。</p>
+		`, channelName, channelId),
+	)
 	notifyRootUser(subject, subject+"\n<br>\n"+content)
 }

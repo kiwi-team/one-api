@@ -22,4 +22,5 @@ var ModelList = []string{
 	"hunyuan-turbos-latest",
 	"hunyuan-t1-20250321",
 	"hunyuan-t1-latest",
+	"hunyuan-embedding",
 }

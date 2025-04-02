@@ -24,3 +24,8 @@ func GetTimeString() string {
 func FormatTime(t time.Time) string {
 	return t.Format("2006-01-02 15:04:05.000")
 }
+
+// CalcElapsedTime return the elapsed time in milliseconds (ms)
+func CalcElapsedTime(start time.Time) int64 {
+	return time.Now().Sub(start).Milliseconds()
+}

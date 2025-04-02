@@ -57,6 +57,14 @@ var ChannelBaseURLs = []string{
 	"",                                          // 53
 	"https://api0.aiguoguo199.com",              // 54
 	"https://qianfan.baidubce.com",              // 55
+	"https://api.x.ai",                          // 45
+	"https://api.replicate.com/v1/models/",      // 46
+	"https://qianfan.baidubce.com",              // 47
+	"https://spark-api-open.xf-yun.com",         // 48
+	"https://dashscope.aliyuncs.com",            // 49
+	"",                                          // 50
+
+	"https://generativelanguage.googleapis.com/v1beta/openai/", // 51
 }
 
 func init() {

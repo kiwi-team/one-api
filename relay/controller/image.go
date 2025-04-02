@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+
 	"github.com/songquanpeng/one-api/common"
 	"github.com/songquanpeng/one-api/common/ctxkey"
 	"github.com/songquanpeng/one-api/common/logger"
@@ -23,7 +24,7 @@ import (
 	relaymodel "github.com/songquanpeng/one-api/relay/model"
 )
 
-func getImageRequest(c *gin.Context, relayMode int) (*relaymodel.ImageRequest, error) {
+func getImageRequest(c *gin.Context, _ int) (*relaymodel.ImageRequest, error) {
 	imageRequest := &relaymodel.ImageRequest{}
 	err := common.UnmarshalBodyReusable(c, imageRequest)
 	if err != nil {
@@ -66,7 +67,7 @@ func getImageSizeRatio(model string, size string) float64 {
 	return 1
 }
 
-func validateImageRequest(imageRequest *relaymodel.ImageRequest, meta *meta.Meta) *relaymodel.ErrorWithStatusCode {
+func validateImageRequest(imageRequest *relaymodel.ImageRequest, _ *meta.Meta) *relaymodel.ErrorWithStatusCode {
 	// check prompt length
 	if imageRequest.Prompt == "" {
 		return openai.ErrorWrapper(errors.New("prompt is required"), "prompt_missing", http.StatusBadRequest)
@@ -151,6 +152,7 @@ func RelayImageHelper(c *gin.Context, relayMode int) *relaymodel.ErrorWithStatus
 	}
 	adaptor.Init(meta)
 
+	// these adaptors need to convert the request
 	switch meta.ChannelType {
 	case channeltype.Friday:
 		fallthrough
@@ -160,7 +162,10 @@ func RelayImageHelper(c *gin.Context, relayMode int) *relaymodel.ErrorWithStatus
 		fallthrough
 	case channeltype.Baidu:
 		fallthrough
-	case channeltype.Zhipu:
+	case channeltype.Zhipu,
+		channeltype.Ali,
+		channeltype.Replicate,
+		channeltype.Baidu:
 		finalRequest, err := adaptor.ConvertImageRequest(imageRequest)
 		if err != nil {
 			return openai.ErrorWrapper(err, "convert_image_request_failed", http.StatusInternalServerError)
@@ -177,7 +182,14 @@ func RelayImageHelper(c *gin.Context, relayMode int) *relaymodel.ErrorWithStatus
 	ratio := modelRatio * groupRatio
 	userQuota, _ := model.CacheGetUserQuota(ctx, meta.UserId)
 
-	quota := int64(ratio*imageCostRatio*1000) * int64(imageRequest.N)
+	var quota int64
+	switch meta.ChannelType {
+	case channeltype.Replicate:
+		// replicate always return 1 image
+		quota = int64(ratio * imageCostRatio * 1000)
+	default:
+		quota = int64(ratio*imageCostRatio*1000) * int64(imageRequest.N)
+	}
 
 	if userQuota-quota < 0 {
 		return openai.ErrorWrapper(errors.New("user quota is not enough"), "insufficient_user_quota", http.StatusForbidden)
@@ -204,7 +216,9 @@ func RelayImageHelper(c *gin.Context, relayMode int) *relaymodel.ErrorWithStatus
 	resp.Body = io.NopCloser(bytes.NewBuffer(responseBodyBytes))
 
 	defer func(ctx context.Context) {
-		if resp != nil && resp.StatusCode != http.StatusOK {
+		if resp != nil &&
+			resp.StatusCode != http.StatusCreated && // replicate returns 201
+			resp.StatusCode != http.StatusOK {
 			return
 		}
 
@@ -231,6 +245,19 @@ func RelayImageHelper(c *gin.Context, relayMode int) *relaymodel.ErrorWithStatus
 			responseBodyContent := string(responseBodyBytes)
 
 			model.RecordConsumeLog(ctx, meta.UserId, meta.ChannelId, 0, 0, imageRequest.Model, tokenName, quota, logContent, milliseconds, requestBodyContent, responseBodyContent)
+			/*
+				logContent := fmt.Sprintf("倍率：%.2f × %.2f", modelRatio, groupRatio)
+				model.RecordConsumeLog(ctx, &model.Log{
+					UserId:           meta.UserId,
+					ChannelId:        meta.ChannelId,
+					PromptTokens:     0,
+					CompletionTokens: 0,
+					ModelName:        imageRequest.Model,
+					TokenName:        tokenName,
+					Quota:            int(quota),
+					Content:          logContent,
+				})
+			*/
 			model.UpdateUserUsedQuotaAndRequestCount(meta.UserId, quota)
 			channelId := c.GetInt(ctxkey.ChannelId)
 			model.UpdateChannelUsedQuota(channelId, quota)

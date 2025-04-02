@@ -7,6 +7,8 @@ import (
 
 	"github.com/songquanpeng/one-api/common"
 	"gorm.io/gorm"
+
+	"github.com/songquanpeng/one-api/common/utils"
 )
 
 type Ability struct {
@@ -58,6 +60,7 @@ func GetRandomSatisfiedChannel(group string, model string, ignoreFirstPriority b
 
 func (channel *Channel) AddAbilities() error {
 	models_ := strings.Split(channel.Models, ",")
+	models_ = utils.DeDuplication(models_)
 	groups_ := strings.Split(channel.Group, ",")
 	abilities := make([]Ability, 0, len(models_))
 	for _, model := range models_ {

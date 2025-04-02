@@ -34,6 +34,19 @@ func PostConsumeQuota(ctx context.Context, tokenId int, quotaDelta int64, totalQ
 	if totalQuota != 0 {
 		logContent := fmt.Sprintf("模型倍率 %.2f，分组倍率 %.2f", modelRatio, groupRatio)
 		model.RecordConsumeLog(ctx, userId, channelId, int(totalQuota), 0, modelName, tokenName, totalQuota, logContent, 0, "", "")
+		/*
+			logContent := fmt.Sprintf("倍率：%.2f × %.2f", modelRatio, groupRatio)
+			model.RecordConsumeLog(ctx, &model.Log{
+				UserId:           userId,
+				ChannelId:        channelId,
+				PromptTokens:     int(totalQuota),
+				CompletionTokens: 0,
+				ModelName:        modelName,
+				TokenName:        tokenName,
+				Quota:            int(totalQuota),
+				Content:          logContent,
+			})
+		*/
 		model.UpdateUserUsedQuotaAndRequestCount(userId, totalQuota)
 		model.UpdateChannelUsedQuota(channelId, totalQuota)
 	}

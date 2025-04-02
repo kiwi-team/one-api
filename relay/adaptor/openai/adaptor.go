@@ -8,10 +8,14 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+
 	"github.com/songquanpeng/one-api/relay/adaptor"
+	"github.com/songquanpeng/one-api/relay/adaptor/alibailian"
 	"github.com/songquanpeng/one-api/relay/adaptor/baidu2"
+	"github.com/songquanpeng/one-api/relay/adaptor/baiduv2"
 	"github.com/songquanpeng/one-api/relay/adaptor/doubao"
 	"github.com/songquanpeng/one-api/relay/adaptor/friday"
+	"github.com/songquanpeng/one-api/relay/adaptor/geminiv2"
 	"github.com/songquanpeng/one-api/relay/adaptor/minimax"
 	"github.com/songquanpeng/one-api/relay/adaptor/newaliyun"
 	"github.com/songquanpeng/one-api/relay/adaptor/novita"
@@ -61,6 +65,12 @@ func (a *Adaptor) GetRequestURL(meta *meta.Meta) (string, error) {
 		return newaliyun.GetRequestURL(meta)
 	case channeltype.Baidu2:
 		return baidu2.GetRequestURL(meta)
+	case channeltype.BaiduV2:
+		return baiduv2.GetRequestURL(meta)
+	case channeltype.AliBailian:
+		return alibailian.GetRequestURL(meta)
+	case channeltype.GeminiOpenAICompatible:
+		return geminiv2.GetRequestURL(meta)
 	default:
 		return GetFullRequestURL(meta.BaseURL, meta.RequestURLPath, meta.ChannelType), nil
 	}

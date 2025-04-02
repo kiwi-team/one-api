@@ -1,6 +1,7 @@
 package helper
 
 import (
+	"context"
 	"fmt"
 	"html/template"
 	"log"
@@ -12,6 +13,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+
 	"github.com/songquanpeng/one-api/common/random"
 )
 
@@ -108,6 +110,18 @@ func GenRequestID() string {
 	return GetTimeString() + random.GetRandomNumberString(8)
 }
 
+func SetRequestID(ctx context.Context, id string) context.Context {
+	return context.WithValue(ctx, RequestIdKey, id)
+}
+
+func GetRequestID(ctx context.Context) string {
+	rawRequestId := ctx.Value(RequestIdKey)
+	if rawRequestId == nil {
+		return ""
+	}
+	return rawRequestId.(string)
+}
+
 func GetResponseID(c *gin.Context) string {
 	logID := c.GetString(RequestIdKey)
 	return fmt.Sprintf("chatcmpl-%s", logID)
@@ -165,4 +179,24 @@ func StringToInt(str string) int {
 		return 0
 	}
 	return num
+}
+
+func Float64PtrMax(p *float64, maxValue float64) *float64 {
+	if p == nil {
+		return nil
+	}
+	if *p > maxValue {
+		return &maxValue
+	}
+	return p
+}
+
+func Float64PtrMin(p *float64, minValue float64) *float64 {
+	if p == nil {
+		return nil
+	}
+	if *p < minValue {
+		return &minValue
+	}
+	return p
 }

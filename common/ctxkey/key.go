@@ -22,4 +22,5 @@ const (
 	AvailableModels   = "available_models"
 	KeyRequestBody    = "key_request_body"
 	ChannelIds        = "channel_ids"
+	SystemPrompt      = "system_prompt"
 )

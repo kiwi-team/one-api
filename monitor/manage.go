@@ -35,8 +35,10 @@ func ShouldDisableChannel(err *model.Error, statusCode int) bool {
 		strings.Contains(lowerMessage, "balance") ||
 		strings.Contains(lowerMessage, "permission denied") ||
 		strings.Contains(lowerMessage, "organization has been restricted") || // groq
-		strings.Contains(lowerMessage, "已欠费") ||
-		strings.Contains(lowerMessage, "不足") {
+		strings.Contains(lowerMessage, "不足") ||
+		strings.Contains(lowerMessage, "api key not valid") || // gemini
+		strings.Contains(lowerMessage, "api key expired") || // gemini
+		strings.Contains(lowerMessage, "已欠费") {
 		return true
 	}
 	return false

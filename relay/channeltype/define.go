@@ -1,61 +1,68 @@
 package channeltype
 
 const (
-	Unknown = iota
-	OpenAI
-	API2D
-	Azure
-	CloseAI
-	OpenAISB
-	OpenAIMax
-	OhMyGPT
-	Custom
-	Ails
-	AIProxy
-	PaLM
-	API2GPT
-	AIGC2D
-	Anthropic
-	Baidu
-	Zhipu
-	Ali
-	Xunfei
-	AI360
-	OpenRouter
-	AIProxyLibrary
-	FastGPT
-	Tencent
-	Gemini
-	Moonshot
-	Baichuan
-	Minimax
-	Mistral
-	Groq
-	Ollama
-	LingYiWanWu
-	StepFun
-	AwsClaude
-	Coze
-	Cohere
-	DeepSeek
-	Cloudflare
-	DeepL
-	TogetherAI
-	Doubao
-	Novita
-	VertextAI
-	Proxy
-	SiliconFlow
-	ImaginePro
-	Friday
-	KlingAI
-	BFL
-	Panda
-	Newaliyun
-	AI302
-	Midjourney
-	Ailab
-	Aiguoguo
-	Baidu2
-	Dummy
+	Unknown                = iota
+	OpenAI                 // 1
+	API2D                  // 2
+	Azure                  // 3
+	CloseAI                // 4
+	OpenAISB               // 5
+	OpenAIMax              // 6
+	OhMyGPT                // 7
+	Custom                 // 8
+	Ails                   // 9
+	AIProxy                // 10
+	PaLM                   // 11
+	API2GPT                // 12
+	AIGC2D                 // 13
+	Anthropic              // 14
+	Baidu                  // 15
+	Zhipu                  // 16
+	Ali                    // 17
+	Xunfei                 // 18
+	AI360                  // 19
+	OpenRouter             // 20
+	AIProxyLibrary         // 21
+	FastGPT                // 22
+	Tencent                // 23
+	Gemini                 // 24
+	Moonshot               // 25
+	Baichuan               // 26
+	Minimax                // 27
+	Mistral                // 28
+	Groq                   // 29
+	Ollama                 // 30
+	LingYiWanWu            // 31
+	StepFun                // 32
+	AwsClaude              // 33
+	Coze                   // 34
+	Cohere                 // 35
+	DeepSeek               // 36
+	Cloudflare             // 37
+	DeepL                  // 38
+	TogetherAI             // 39
+	Doubao                 // 40
+	Novita                 // 41
+	VertextAI              // 42
+	Proxy                  // 43
+	SiliconFlow            // 44
+	ImaginePro             // 45
+	Friday                 // 46
+	KlingAI                // 47
+	BFL                    // 48
+	Panda                  // 49
+	Newaliyun              // 50
+	AI302                  // 51
+	Midjourney             // 52
+	Ailab                  // 53
+	Aiguoguo               // 54
+	Baidu2                 // 55
+	XAI                    // 56
+	Replicate              // 57
+	BaiduV2                // 58
+	XunfeiV2               // 59
+	AliBailian             // 60
+	OpenAICompatible       // 61
+	GeminiOpenAICompatible // 62
+	Dummy                  // 63
 )
