@@ -21,9 +21,22 @@ func GetAllTokens(c *gin.Context) {
 	if p < 0 {
 		p = 0
 	}
+	get_total, _ := strconv.Atoi(c.Query("return_total"))
+	if get_total < 0 {
+		get_total = 0
+	}
+	var (
+		total  int64
+		tokens []*model.Token
+		err    error
+	)
 
 	order := c.Query("order")
-	tokens, err := model.GetAllUserTokens(userId, p*config.ItemsPerPage, config.ItemsPerPage, order)
+	if get_total == 1 {
+		tokens, total, err = model.GetAllUserTokensAndTotal(userId, p*config.ItemsPerPage, config.ItemsPerPage, order)
+	} else {
+		tokens, err = model.GetAllUserTokens(userId, p*config.ItemsPerPage, config.ItemsPerPage, order)
+	}
 
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
@@ -32,12 +45,13 @@ func GetAllTokens(c *gin.Context) {
 		})
 		return
 	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "",
 		"data":    tokens,
+		"total":   total,
 	})
-	return
 }
 
 func SearchTokens(c *gin.Context) {
@@ -251,7 +265,10 @@ func UpdateToken(c *gin.Context) {
 		cleanToken.UnlimitedQuota = token.UnlimitedQuota
 		cleanToken.Models = token.Models
 		cleanToken.Subnet = token.Subnet
-		cleanToken.ChannelIds = token.ChannelIds
+		// channel_ids设置成0的时候，表示不更新渠道,aice那边，传递过来的channel_ids是0
+		if token.ChannelIds != nil && *token.ChannelIds != "0" {
+			cleanToken.ChannelIds = token.ChannelIds
+		}
 	}
 	err = cleanToken.Update()
 	if err != nil {

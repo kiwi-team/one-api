@@ -55,6 +55,30 @@ func GetAllUserTokens(userId int, startIdx int, num int, order string) ([]*Token
 	return tokens, err
 }
 
+func GetAllUserTokensAndTotal(userId int, startIdx int, num int, order string) ([]*Token, int64, error) {
+	var tokens []*Token
+	var err error
+	query := DB.Where("user_id = ?", userId)
+
+	total := int64(0)
+	err = DB.Model(&Token{}).Where("user_id = ?", userId).Count(&total).Error
+	if err != nil {
+		return nil, 0, err
+	}
+
+	switch order {
+	case "remain_quota":
+		query = query.Order("unlimited_quota desc, remain_quota desc")
+	case "used_quota":
+		query = query.Order("used_quota desc")
+	default:
+		query = query.Order("id desc")
+	}
+
+	err = query.Limit(num).Offset(startIdx).Find(&tokens).Error
+	return tokens, total, err
+}
+
 func SearchUserTokens(userId int, keyword string) (tokens []*Token, err error) {
 	err = DB.Where("user_id = ?", userId).Where("name LIKE ?", keyword+"%").Find(&tokens).Error
 	return tokens, err
