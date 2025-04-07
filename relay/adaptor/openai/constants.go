@@ -34,7 +34,6 @@ var ModelList = []string{
 	"gpt-4o-audio-preview-2024-12-17",
 	"o1",
 	"o1-2024-12-17",
-	"gpt-4o-2024-11-20",
 	"o1-mini",
 	"o1-mini-2024-09-12",
 	"o1-preview",

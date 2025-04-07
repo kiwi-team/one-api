@@ -170,3 +170,7 @@ var UserContentRequestTimeout = env.Int("USER_CONTENT_REQUEST_TIMEOUT", 30)
 
 var EnforceIncludeUsage = env.Bool("ENFORCE_INCLUDE_USAGE", false)
 var TestPrompt = env.String("TEST_PROMPT", "Output only your specific model name with no additional text.")
+
+var DataExportEnabled = env.Bool("DATA_EXPORT_ENABLED", true)
+var DataExportInterval = env.Int("DATA_EXPORT_INTERVAL", 5)                // unit: minute
+var DataExportDefaultTime = env.String("DATA_EXPORT_DEFAULT_TIME", "hour") // unit: minute

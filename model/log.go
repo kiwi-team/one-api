@@ -6,6 +6,7 @@ import (
 
 	"gorm.io/gorm"
 
+	"github.com/bytedance/gopkg/util/gopool"
 	"github.com/songquanpeng/one-api/common"
 	"github.com/songquanpeng/one-api/common/config"
 	"github.com/songquanpeng/one-api/common/helper"
@@ -90,10 +91,16 @@ func RecordConsumeLog(ctx context.Context, userId int, channelId int, promptToke
 	if !config.LogConsumeEnabled {
 		return
 	}
+	username := GetUsernameById(userId)
+	if config.DataExportEnabled {
+		gopool.Go(func() {
+			LogQuotaData(userId, username, modelName, int(quota), helper.GetTimestamp(), promptTokens+completionTokens)
+		})
+	}
 	requestId := helper.GetRequestID(ctx)
 	log := &Log{
 		UserId:           userId,
-		Username:         GetUsernameById(userId),
+		Username:         username,
 		CreatedAt:        helper.GetTimestamp(),
 		Type:             LogTypeConsume,
 		Content:          content,
@@ -127,6 +134,11 @@ func RecordOneConsumeLog(ctx context.Context, log *Log) {
 	log.Username = GetUsernameById(log.UserId)
 	log.CreatedAt = helper.GetTimestamp()
 	log.Type = LogTypeConsume
+	if config.DataExportEnabled {
+		gopool.Go(func() {
+			LogQuotaData(log.UserId, log.Username, log.ModelName, log.Quota, log.CreatedAt, log.PromptTokens+log.CompletionTokens)
+		})
+	}
 	recordLogHelper(ctx, log)
 }
 

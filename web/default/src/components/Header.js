@@ -57,6 +57,11 @@ let headerButtons = [
     icon: 'chart bar',
   },
   {
+    name: 'header.detail',
+    to: '/detail',
+    icon: 'chart pie',
+  },
+  {
     name: 'header.log',
     to: '/log',
     icon: 'book',

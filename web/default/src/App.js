@@ -26,6 +26,7 @@ import Log from './pages/Log';
 import Chat from './pages/Chat';
 import LarkOAuth from './components/LarkOAuth';
 import Dashboard from './pages/Dashboard';
+import Detail from './pages/Detail';
 
 const Home = lazy(() => import('./pages/Home'));
 const About = lazy(() => import('./pages/About'));
@@ -306,6 +307,14 @@ function App() {
           </PrivateRoute>
         }
       />
+      <Route
+        path='/detail'
+        element={
+          <PrivateRoute>
+            <Detail />
+          </PrivateRoute>
+        }
+        />
       <Route path='*' element={<NotFound />} />
     </Routes>
   );

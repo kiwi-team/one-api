@@ -168,6 +168,9 @@ func migrateDB() error {
 	if err = DB.AutoMigrate(&OperateLog{}); err != nil {
 		return err
 	}
+	if err = DB.AutoMigrate(&QuotaData{}); err != nil {
+		return err
+	}
 	return nil
 }
 

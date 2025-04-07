@@ -489,127 +489,10 @@ const LogsTable = () => {
                 >
                   {t('log.table.completion_tokens')}
                 </Table.HeaderCell>
-              }
-              <Table.HeaderCell
-                style={{ cursor: 'pointer' }}
-                onClick={() => {
-                  sortLog('token_name');
-                }}
-                width={1}
-              >
-                令牌
-              </Table.HeaderCell>
-              <Table.HeaderCell
-                style={{ cursor: 'pointer' }}
-                onClick={() => {
-                  sortLog('type');
-                }}
-                width={1}
-              >
-                类型
-              </Table.HeaderCell>
-              <Table.HeaderCell
-                style={{ cursor: 'pointer' }}
-                onClick={() => {
-                  sortLog('model_name');
-                }}
-                width={2}
-              >
-                模型
-              </Table.HeaderCell>
-              <Table.HeaderCell
-                style={{ cursor: 'pointer' }}
-                onClick={() => {
-                  sortLog('prompt_tokens');
-                }}
-                width={1}
-              >
-                提示
-              </Table.HeaderCell>
-              <Table.HeaderCell
-                style={{ cursor: 'pointer' }}
-                onClick={() => {
-                  sortLog('completion_tokens');
-                }}
-                width={1}
-              >
-                补全
-              </Table.HeaderCell>
-              <Table.HeaderCell
-                style={{ cursor: 'pointer' }}
-                onClick={() => {
-                  sortLog('milliseconds');
-                }}
-                width={1}
-              >
-                耗时(ms) 
-              </Table.HeaderCell>
-              <Table.HeaderCell
-                style={{ cursor: 'pointer' }}
-                onClick={() => {
-                  sortLog('quota');
-                }}
-                width={1}
-              >
-                额度
-              </Table.HeaderCell>
-              <Table.HeaderCell
-                style={{ cursor: 'pointer' }}
-                onClick={() => {
-                  sortLog('content');
-                }}
-                width={isAdminUser ? 4 : 6}
-              >
-                详情
-              </Table.HeaderCell>
-            </Table.Row>
-          </Table.Header>
-
-          <Table.Body>
-            {logs
-              .slice(
-                (activePage - 1) * ITEMS_PER_PAGE,
-                activePage * ITEMS_PER_PAGE
-              )
-              .map((log, idx) => {
-                if (log.deleted) return <></>;
-                return (
-                  <Table.Row key={log.id}>
-                    <Table.Cell>{renderTimestamp(log.created_at)}</Table.Cell>
-                    {
-                      isAdminUser && (
-                        <Table.Cell>{log.channel ? <Label basic>{log.channel}</Label> : ''}</Table.Cell>
-                      )
-                    }
-                    {
-                      isAdminUser && (
-                        <Table.Cell>{log.username ? <Label>{log.username}</Label> : ''}</Table.Cell>
-                      )
-                    }
-                    <Table.Cell>{log.token_name ? <Label basic>{log.token_name}</Label> : ''}</Table.Cell>
-                    <Table.Cell>{renderType(log.type)}</Table.Cell>
-                    <Table.Cell>{log.model_name ? <Label basic>{log.model_name}</Label> : ''}</Table.Cell>
-                    <Table.Cell>{log.prompt_tokens ? log.prompt_tokens : ''}</Table.Cell>
-                    <Table.Cell>{log.completion_tokens ? log.completion_tokens : ''}</Table.Cell>
-                    <Table.Cell>{log.milliseconds ? log.milliseconds  : '-'}</Table.Cell>
-                    <Table.Cell>{log.quota ? renderQuota(log.quota, 6) : ''}</Table.Cell>
-                    <Table.Cell>{log.content}</Table.Cell>
-                  </Table.Row>
-                );
-              })}
-          </Table.Body>
-
-          <Table.Footer>
-            <Table.Row>
-              <Table.HeaderCell colSpan={'10'}>
-                <Select
-                  placeholder='选择明细分类'
-                  options={LOG_OPTIONS}
-                  style={{ marginRight: '8px' }}
-                  name='logType'
-                  value={logType}
-                  onChange={(e, { name, value }) => {
-                    setLogType(value);
+                <Table.HeaderCell
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => {
+                    sortLog('quota');
                   }}
                   width={1}
                 >
@@ -617,7 +500,15 @@ const LogsTable = () => {
                 </Table.HeaderCell>
               </>
             )}
-            <Table.HeaderCell>{t('log.table.detail')}</Table.HeaderCell>
+            <Table.HeaderCell
+              style={{ cursor: 'pointer' }}
+              onClick={() => {
+                sortLog('content');
+              }}
+              width={isAdminUser ? 4 : 6}
+            >
+              {t('log.table.detail')}
+            </Table.HeaderCell>
           </Table.Row>
         </Table.Header>
 
@@ -628,7 +519,7 @@ const LogsTable = () => {
               activePage * ITEMS_PER_PAGE
             )
             .map((log, idx) => {
-              if (log.deleted) return <></>;
+              if (log.deleted) return null;
               return (
                 <Table.Row key={log.id}>
                   <Table.Cell>
@@ -644,14 +535,12 @@ const LogsTable = () => {
                         >
                           {log.channel}
                         </Label>
-                      ) : (
-                        ''
-                      )}
+                      ) : null}
                     </Table.Cell>
                   )}
                   <Table.Cell>{renderType(log.type)}</Table.Cell>
                   <Table.Cell>
-                    {log.model_name ? renderColorLabel(log.model_name) : ''}
+                    {log.model_name ? renderColorLabel(log.model_name) : null}
                   </Table.Cell>
                   {showUserTokenQuota() && (
                     <>
@@ -665,27 +554,23 @@ const LogsTable = () => {
                             >
                               {log.username}
                             </Label>
-                          ) : (
-                            ''
-                          )}
+                          ) : null}
                         </Table.Cell>
                       )}
                       <Table.Cell>
-                        {log.token_name ? renderColorLabel(log.token_name) : ''}
-                      </Table.Cell>
-
-                      <Table.Cell>
-                        {log.prompt_tokens ? log.prompt_tokens : ''}
+                        {log.token_name ? renderColorLabel(log.token_name) : null}
                       </Table.Cell>
                       <Table.Cell>
-                        {log.completion_tokens ? log.completion_tokens : ''}
+                        {log.prompt_tokens ? log.prompt_tokens : null}
                       </Table.Cell>
                       <Table.Cell>
-                        {log.quota ? renderQuota(log.quota, t, 6) : ''}
+                        {log.completion_tokens ? log.completion_tokens : null}
+                      </Table.Cell>
+                      <Table.Cell>
+                        {log.quota ? renderQuota(log.quota, t, 6) : null}
                       </Table.Cell>
                     </>
                   )}
-
                   <Table.Cell>{renderDetail(log)}</Table.Cell>
                 </Table.Row>
               );

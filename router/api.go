@@ -62,6 +62,9 @@ func SetApiRouter(router *gin.Engine) {
 				adminRoute.DELETE("/:id", controller.DeleteUser)
 			}
 		}
+		dataRoute := apiRouter.Group("/data")
+		dataRoute.GET("/", middleware.AdminAuth(), controller.GetAllQuotaDates)
+		dataRoute.GET("/self", middleware.UserAuth(), controller.GetUserQuotaDates)
 		optionRoute := apiRouter.Group("/option")
 		optionRoute.Use(middleware.RootAuth())
 		{

@@ -102,6 +102,9 @@ func main() {
 		logger.FatalLog("failed to initialize i18n: " + err.Error())
 	}
 
+	// 数据看板
+	go model.UpdateQuotaData()
+
 	// Initialize HTTP server
 	server := gin.New()
 	server.Use(gin.Recovery())

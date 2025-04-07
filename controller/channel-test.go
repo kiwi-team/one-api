@@ -69,6 +69,7 @@ func testChannel(ctx context.Context, channel *model.Channel, request *relaymode
 	startTime := time.Now()
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
+	responseStr := ""
 	c.Request = &http.Request{
 		Method: "POST",
 		URL:    &url.URL{Path: "/v1/chat/completions"},
@@ -126,6 +127,8 @@ func testChannel(ctx context.Context, channel *model.Channel, request *relaymode
 			ModelName:   modelName,
 			Content:     logContent,
 			ElapsedTime: helper.CalcElapsedTime(startTime),
+			Request:     string(jsonData),
+			Response:    responseStr,
 		})
 	}()
 	logger.SysLog(string(jsonData))
@@ -151,6 +154,7 @@ func testChannel(ctx context.Context, channel *model.Channel, request *relaymode
 		return "", errors.New("usage is nil"), nil
 	}
 	rawResponse := w.Body.String()
+	responseStr = rawResponse
 	_, responseMessage, err = parseTestResponse(rawResponse)
 	if err != nil {
 		logger.SysError(fmt.Sprintf("failed to parse error: %s, \nresponse: %s", err.Error(), rawResponse))

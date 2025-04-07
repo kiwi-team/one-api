@@ -158,10 +158,6 @@ func RelayImageHelper(c *gin.Context, relayMode int) *relaymodel.ErrorWithStatus
 		fallthrough
 	case channeltype.Ailab:
 		fallthrough
-	case channeltype.Ali:
-		fallthrough
-	case channeltype.Baidu:
-		fallthrough
 	case channeltype.Zhipu,
 		channeltype.Ali,
 		channeltype.Replicate,

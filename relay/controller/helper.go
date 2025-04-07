@@ -15,6 +15,7 @@ import (
 
 	"github.com/songquanpeng/one-api/common"
 	"github.com/songquanpeng/one-api/common/config"
+	"github.com/songquanpeng/one-api/common/helper"
 	"github.com/songquanpeng/one-api/common/logger"
 	"github.com/songquanpeng/one-api/model"
 	"github.com/songquanpeng/one-api/relay/adaptor/openai"
@@ -113,7 +114,7 @@ func preConsumeQuota(ctx context.Context, textRequest *relaymodel.GeneralOpenAIR
 }
 
 // func postConsumeQuota(ctx context.Context, usage *relaymodel.Usage, meta *meta.Meta, textRequest *relaymodel.GeneralOpenAIRequest, ratio float64, preConsumedQuota int64, modelRatio float64, groupRatio float64, systemPromptReset bool) {
-func postConsumeQuota(ctx context.Context, usage *relaymodel.Usage, meta *meta.Meta, modelName string, ratio float64, preConsumedQuota int64, modelRatio float64, groupRatio float64, requestBodyContent string, responseBodyContent string) {
+func postConsumeQuota(ctx context.Context, usage *relaymodel.Usage, meta *meta.Meta, modelName string, ratio float64, preConsumedQuota int64, modelRatio float64, groupRatio float64, requestBodyContent string, responseBodyContent string, systemPromptReset bool) {
 	if usage == nil {
 		logger.Error(ctx, "usage is nil, which is unexpected")
 		return
@@ -146,24 +147,25 @@ func postConsumeQuota(ctx context.Context, usage *relaymodel.Usage, meta *meta.M
 		// 计算耗时
 		milliseconds = int(time.Since(startTime).Milliseconds())
 	}
-	logContent := fmt.Sprintf("模型倍率 %.2f，分组倍率 %.2f，补全倍率 %.2f", modelRatio, groupRatio, completionRatio)
-	model.RecordConsumeLog(ctx, meta.UserId, meta.ChannelId, promptTokens, completionTokens, modelName, meta.TokenName, quota, logContent, milliseconds, requestBodyContent, responseBodyContent)
-	/*
-		logContent := fmt.Sprintf("倍率：%.2f × %.2f × %.2f", modelRatio, groupRatio, completionRatio)
-		model.RecordConsumeLog(ctx, &model.Log{
-			UserId:            meta.UserId,
-			ChannelId:         meta.ChannelId,
-			PromptTokens:      promptTokens,
-			CompletionTokens:  completionTokens,
-			ModelName:         textRequest.Model,
-			TokenName:         meta.TokenName,
-			Quota:             int(quota),
-			Content:           logContent,
-			IsStream:          meta.IsStream,
-			ElapsedTime:       helper.CalcElapsedTime(meta.StartTime),
-			SystemPromptReset: systemPromptReset,
-		})
-	*/
+	//logContent := fmt.Sprintf("模型倍率 %.2f，分组倍率 %.2f，补全倍率 %.2f", modelRatio, groupRatio, completionRatio)
+	//model.RecordConsumeLog(ctx, meta.UserId, meta.ChannelId, promptTokens, completionTokens, modelName, meta.TokenName, quota, logContent, milliseconds, requestBodyContent, responseBodyContent)
+	logContent := fmt.Sprintf("倍率：%.2f × %.2f × %.2f", modelRatio, groupRatio, completionRatio)
+	model.RecordOneConsumeLog(ctx, &model.Log{
+		UserId:            meta.UserId,
+		ChannelId:         meta.ChannelId,
+		PromptTokens:      promptTokens,
+		CompletionTokens:  completionTokens,
+		ModelName:         modelName,
+		TokenName:         meta.TokenName,
+		Quota:             int(quota),
+		Content:           logContent,
+		Milliseconds:      milliseconds,
+		Request:           requestBodyContent,
+		Response:          responseBodyContent,
+		IsStream:          meta.IsStream,
+		ElapsedTime:       helper.CalcElapsedTime(meta.StartTime),
+		SystemPromptReset: systemPromptReset,
+	})
 	model.UpdateUserUsedQuotaAndRequestCount(meta.UserId, quota)
 	model.UpdateChannelUsedQuota(meta.ChannelId, quota)
 }

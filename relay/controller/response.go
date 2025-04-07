@@ -92,8 +92,9 @@ func RelayResponsesHelper(c *gin.Context, relayMode int) *relaymodel.ErrorWithSt
 
 	responseBodyBytes, _ := io.ReadAll(&responseBodyBuf)
 	responseBodyContent := string(responseBodyBytes)
+	systemPromptReset := false // setSystemPrompt(ctx, textRequest, meta.ForcedSystemPrompt)
 
 	// post-consume quota
-	go postConsumeQuota(ctx, usage, meta, textRequest.Model, ratio, preConsumedQuota, modelRatio, groupRatio, requestBodyContent, responseBodyContent)
+	go postConsumeQuota(ctx, usage, meta, textRequest.Model, ratio, preConsumedQuota, modelRatio, groupRatio, requestBodyContent, responseBodyContent, systemPromptReset)
 	return nil
 }
