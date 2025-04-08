@@ -94,7 +94,7 @@ func RecordConsumeLog(ctx context.Context, userId int, channelId int, promptToke
 	username := GetUsernameById(userId)
 	if config.DataExportEnabled {
 		gopool.Go(func() {
-			LogQuotaData(userId, username, modelName, int(quota), helper.GetTimestamp(), promptTokens+completionTokens)
+			LogQuotaData(userId, username, modelName, int(quota), helper.GetTimestamp(), promptTokens+completionTokens, tokenName)
 		})
 	}
 	requestId := helper.GetRequestID(ctx)
@@ -136,7 +136,7 @@ func RecordOneConsumeLog(ctx context.Context, log *Log) {
 	log.Type = LogTypeConsume
 	if config.DataExportEnabled {
 		gopool.Go(func() {
-			LogQuotaData(log.UserId, log.Username, log.ModelName, log.Quota, log.CreatedAt, log.PromptTokens+log.CompletionTokens)
+			LogQuotaData(log.UserId, log.Username, log.ModelName, log.Quota, log.CreatedAt, log.PromptTokens+log.CompletionTokens, log.TokenName)
 		})
 	}
 	recordLogHelper(ctx, log)

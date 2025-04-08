@@ -33,7 +33,8 @@ func GetAllTokens(c *gin.Context) {
 
 	order := c.Query("order")
 	if get_total == 1 {
-		tokens, total, err = model.GetAllUserTokensAndTotal(userId, p*config.ItemsPerPage, config.ItemsPerPage, order)
+		// 返回给aice， 每页直接是50条
+		tokens, total, err = model.GetAllUserTokensAndTotal(userId, p*50, 50, order)
 	} else {
 		tokens, err = model.GetAllUserTokens(userId, p*config.ItemsPerPage, config.ItemsPerPage, order)
 	}
