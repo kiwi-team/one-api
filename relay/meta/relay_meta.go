@@ -35,6 +35,7 @@ type Meta struct {
 	PromptTokens       int // only for DoResponse
 	ForcedSystemPrompt string
 	StartTime          time.Time
+	IP                 string
 }
 
 func GetByContext(c *gin.Context) *Meta {
@@ -53,6 +54,7 @@ func GetByContext(c *gin.Context) *Meta {
 		RequestURLPath:     c.Request.URL.String(),
 		ForcedSystemPrompt: c.GetString(ctxkey.SystemPrompt),
 		StartTime:          time.Now(),
+		IP:                 c.ClientIP(),
 	}
 	cfg, ok := c.Get(ctxkey.Config)
 	if ok {

@@ -133,6 +133,10 @@ func postConsumeQuota(ctx context.Context, usage *relaymodel.Usage, meta *meta.M
 		// we cannot just return, because we may have to return the pre-consumed quota
 		quota = 0
 	}
+	oneTimeQuota := billingratio.GetOneTimeQuota(modelName)
+	if oneTimeQuota > 0 {
+		quota = int64(oneTimeQuota)
+	}
 	quotaDelta := quota - preConsumedQuota
 	err := model.PostConsumeTokenQuota(meta.TokenId, quotaDelta)
 	if err != nil {
@@ -150,6 +154,9 @@ func postConsumeQuota(ctx context.Context, usage *relaymodel.Usage, meta *meta.M
 	//logContent := fmt.Sprintf("模型倍率 %.2f，分组倍率 %.2f，补全倍率 %.2f", modelRatio, groupRatio, completionRatio)
 	//model.RecordConsumeLog(ctx, meta.UserId, meta.ChannelId, promptTokens, completionTokens, modelName, meta.TokenName, quota, logContent, milliseconds, requestBodyContent, responseBodyContent)
 	logContent := fmt.Sprintf("倍率：%.2f × %.2f × %.2f", modelRatio, groupRatio, completionRatio)
+	if oneTimeQuota > 0 {
+		logContent = fmt.Sprintf("单次请求配额：%.2f", oneTimeQuota)
+	}
 	model.RecordOneConsumeLog(ctx, &model.Log{
 		UserId:            meta.UserId,
 		ChannelId:         meta.ChannelId,
@@ -165,6 +172,7 @@ func postConsumeQuota(ctx context.Context, usage *relaymodel.Usage, meta *meta.M
 		IsStream:          meta.IsStream,
 		ElapsedTime:       helper.CalcElapsedTime(meta.StartTime),
 		SystemPromptReset: systemPromptReset,
+		IP:                meta.IP,
 	})
 	model.UpdateUserUsedQuotaAndRequestCount(meta.UserId, quota)
 	model.UpdateChannelUsedQuota(meta.ChannelId, quota)

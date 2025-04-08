@@ -129,6 +129,7 @@ func testChannel(ctx context.Context, channel *model.Channel, request *relaymode
 			ElapsedTime: helper.CalcElapsedTime(startTime),
 			Request:     string(jsonData),
 			Response:    responseStr,
+			IP:          meta.IP,
 		})
 	}()
 	logger.SysLog(string(jsonData))

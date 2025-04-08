@@ -11,7 +11,6 @@ import (
 	"github.com/songquanpeng/one-api/common/render"
 
 	"github.com/songquanpeng/one-api/common"
-	"github.com/songquanpeng/one-api/common/config"
 	"github.com/songquanpeng/one-api/common/helper"
 	"github.com/songquanpeng/one-api/common/image"
 	"github.com/songquanpeng/one-api/common/logger"
@@ -37,28 +36,30 @@ var mimeTypeMap = map[string]string{
 // Setting safety to the lowest possible values since Gemini is already powerless enough
 func ConvertRequest(textRequest model.GeneralOpenAIRequest) *ChatRequest {
 	geminiRequest := ChatRequest{
-		Contents: make([]ChatContent, 0, len(textRequest.Messages)),
+		Contents:       make([]ChatContent, 0, len(textRequest.Messages)),
 		SafetySettings: []ChatSafetySettings{
-			{
-				Category:  "HARM_CATEGORY_HARASSMENT",
-				Threshold: config.GeminiSafetySetting,
-			},
-			{
-				Category:  "HARM_CATEGORY_HATE_SPEECH",
-				Threshold: "BLOCK_ONLY_HIGH",
-			},
-			{
-				Category:  "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-				Threshold: "BLOCK_ONLY_HIGH",
-			},
-			{
-				Category:  "HARM_CATEGORY_DANGEROUS_CONTENT",
-				Threshold: "BLOCK_ONLY_HIGH",
-			},
-			{
-				Category:  "HARM_CATEGORY_CIVIC_INTEGRITY",
-				Threshold: config.GeminiSafetySetting,
-			},
+			/*
+				{
+					Category:  "HARM_CATEGORY_HARASSMENT",
+					Threshold: config.GeminiSafetySetting,
+				},
+					{
+						Category:  "HARM_CATEGORY_HATE_SPEECH",
+						Threshold: "BLOCK_NONE",
+					},
+					{
+						Category:  "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+						Threshold: "BLOCK_ONLY_HIGH",
+					},
+					{
+						Category:  "HARM_CATEGORY_DANGEROUS_CONTENT",
+						Threshold: "BLOCK_ONLY_HIGH",
+					},
+					{
+						Category: "HARM_CATEGORY_CIVIC_INTEGRITY",
+						Threshold: "BLOCK_ONLY_HIGH",
+					},
+			*/
 		},
 		GenerationConfig: ChatGenerationConfig{
 			Temperature:     textRequest.Temperature,

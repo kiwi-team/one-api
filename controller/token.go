@@ -31,6 +31,7 @@ func GetAllTokens(c *gin.Context) {
 		err    error
 	)
 
+	// 返回给aice， 每页直接是50条
 	order := c.Query("order")
 	if get_total == 1 {
 		// 返回给aice， 每页直接是50条

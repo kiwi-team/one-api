@@ -26,96 +26,101 @@ var modelRatioLock sync.RWMutex
 // 1 === ￥0.014 / 1k tokens
 var ModelRatio = map[string]float64{
 	// https://openai.com/pricing
-	"gpt-4":                   15,
-	"gpt-4-0314":              15,
-	"gpt-4-0613":              15,
-	"gpt-4-32k":               30,
-	"gpt-4-32k-0314":          30,
-	"gpt-4-32k-0613":          30,
-	"gpt-4-1106-preview":      5,     // $0.01 / 1K tokens
-	"gpt-4-0125-preview":      5,     // $0.01 / 1K tokens
-	"gpt-4-turbo-preview":     5,     // $0.01 / 1K tokens
-	"gpt-4-turbo":             5,     // $0.01 / 1K tokens
-	"gpt-4-turbo-2024-04-09":  5,     // $0.01 / 1K tokens
-	"gpt-4o":                  2.5,   // $0.005 / 1K tokens
-	"chatgpt-4o-latest":       2.5,   // $0.005 / 1K tokens
-	"gpt-4o-2024-05-13":       2.5,   // $0.005 / 1K tokens
-	"gpt-4o-2024-08-06":       1.25,  // $0.0025 / 1K tokens
-	"gpt-4o-2024-11-20":       1.25,  // $0.0025 / 1K tokens
-	"gpt-4o-mini":             0.075, // $0.00015 / 1K tokens
-	"gpt-4o-mini-2024-07-18":  0.075, // $0.00015 / 1K tokens
-	"gpt-4-vision-preview":    5,     // $0.01 / 1K tokens
-	"gpt-3.5-turbo":           0.25,  // $0.0005 / 1K tokens
-	"gpt-3.5-turbo-0301":      0.75,
-	"gpt-3.5-turbo-0613":      0.75,
-	"gpt-3.5-turbo-16k":       1.5, // $0.003 / 1K tokens
-	"gpt-3.5-turbo-16k-0613":  1.5,
-	"gpt-3.5-turbo-instruct":  0.75, // $0.0015 / 1K tokens
-	"gpt-3.5-turbo-1106":      0.5,  // $0.001 / 1K tokens
-	"gpt-3.5-turbo-0125":      0.25, // $0.0005 / 1K tokens
-	"o1":                      7.5,  // $15.00 / 1M input tokens
-	"o1-2024-12-17":           7.5,
-	"o1-preview":              7.5, // $15.00 / 1M input tokens
-	"o1-preview-2024-09-12":   7.5,
-	"o1-mini":                 1.5, // $3.00 / 1M input tokens
-	"o1-mini-2024-09-12":      1.5,
-	"o3-mini":                 1.5, // $3.00 / 1M input tokens
-	"o3-mini-2025-01-31":      1.5,
-	"davinci-002":             1,   // $0.002 / 1K tokens
-	"babbage-002":             0.2, // $0.0004 / 1K tokens
-	"text-ada-001":            0.2,
-	"text-babbage-001":        0.25,
-	"text-curie-001":          1,
-	"text-davinci-002":        10,
-	"text-davinci-003":        10,
-	"text-davinci-edit-001":   10,
-	"code-davinci-edit-001":   10,
-	"whisper-1":               15,  // $0.006 / minute -> $0.006 / 150 words -> $0.006 / 200 tokens -> $0.03 / 1k tokens
-	"tts-1":                   7.5, // $0.015 / 1K characters
-	"tts-1-1106":              7.5,
-	"tts-1-hd":                15, // $0.030 / 1K characters
-	"tts-1-hd-1106":           15,
-	"davinci":                 10,
-	"curie":                   10,
-	"babbage":                 10,
-	"ada":                     10,
-	"text-embedding-ada-002":  0.05,
-	"text-embedding-3-small":  0.01,
-	"text-embedding-3-large":  0.065,
-	"text-search-ada-doc-001": 10,
-	"text-moderation-stable":  0.1,
-	"text-moderation-latest":  0.1,
-	"dall-e-2":                0.02 * USD, // $0.016 - $0.020 / image
-	"dall-e-3":                0.04 * USD, // $0.040 - $0.120 / image
+	"gpt-4":                      15,
+	"gpt-4-0314":                 15,
+	"gpt-4-0613":                 15,
+	"gpt-4-32k":                  30,
+	"gpt-4-32k-0314":             30,
+	"gpt-4-32k-0613":             30,
+	"gpt-4-1106-preview":         5,     // $0.01 / 1K tokens
+	"gpt-4-0125-preview":         5,     // $0.01 / 1K tokens
+	"gpt-4-turbo-preview":        5,     // $0.01 / 1K tokens
+	"gpt-4-turbo":                5,     // $0.01 / 1K tokens
+	"gpt-4-turbo-2024-04-09":     5,     // $0.01 / 1K tokens
+	"gpt-4o":                     2.5,   // $0.005 / 1K tokens
+	"chatgpt-4o-latest":          2.5,   // $0.005 / 1K tokens
+	"gpt-4o-2024-05-13":          2.5,   // $0.005 / 1K tokens
+	"gpt-4o-2024-08-06":          1.25,  // $0.0025 / 1K tokens
+	"gpt-4o-2024-11-20":          1.25,  // $0.0025 / 1K tokens
+	"gpt-4o-mini":                0.075, // $0.00015 / 1K tokens
+	"gpt-4o-mini-2024-07-18":     0.075, // $0.00015 / 1K tokens
+	"gpt-4-vision-preview":       5,     // $0.01 / 1K tokens
+	"gpt-3.5-turbo":              0.25,  // $0.0005 / 1K tokens
+	"gpt-3.5-turbo-0301":         0.75,
+	"gpt-3.5-turbo-0613":         0.75,
+	"gpt-3.5-turbo-16k":          1.5, // $0.003 / 1K tokens
+	"gpt-3.5-turbo-16k-0613":     1.5,
+	"gpt-3.5-turbo-instruct":     0.75, // $0.0015 / 1K tokens
+	"gpt-3.5-turbo-1106":         0.5,  // $0.001 / 1K tokens
+	"gpt-3.5-turbo-0125":         0.25, // $0.0005 / 1K tokens
+	"gpt-4.5-preview":            37.5,
+	"gpt-4.5-preview-2025-02-27": 37.5,
+	"o1":                         7.5, // $15.00 / 1M input tokens
+	"o1-2024-12-17":              7.5,
+	"o1-preview":                 7.5, // $15.00 / 1M input tokens
+	"o1-preview-2024-09-12":      7.5,
+	"o1-mini":                    1.5, // $3.00 / 1M input tokens
+	"o1-mini-2024-09-12":         1.5,
+	"o3-mini":                    1.5, // $3.00 / 1M input tokens
+	"o3-mini-2025-01-31":         1.5,
+	"davinci-002":                1,   // $0.002 / 1K tokens
+	"babbage-002":                0.2, // $0.0004 / 1K tokens
+	"text-ada-001":               0.2,
+	"text-babbage-001":           0.25,
+	"text-curie-001":             1,
+	"text-davinci-002":           10,
+	"text-davinci-003":           10,
+	"text-davinci-edit-001":      10,
+	"code-davinci-edit-001":      10,
+	"whisper-1":                  15,  // $0.006 / minute -> $0.006 / 150 words -> $0.006 / 200 tokens -> $0.03 / 1k tokens
+	"tts-1":                      7.5, // $0.015 / 1K characters
+	"tts-1-1106":                 7.5,
+	"tts-1-hd":                   15, // $0.030 / 1K characters
+	"tts-1-hd-1106":              15,
+	"davinci":                    10,
+	"curie":                      10,
+	"babbage":                    10,
+	"ada":                        10,
+	"text-embedding-ada-002":     0.05,
+	"text-embedding-3-small":     0.01,
+	"text-embedding-3-large":     0.065,
+	"text-search-ada-doc-001":    10,
+	"text-moderation-stable":     0.1,
+	"text-moderation-latest":     0.1,
+	"dall-e-2":                   0.02 * USD, // $0.016 - $0.020 / image
+	"dall-e-3":                   0.04 * USD, // $0.040 - $0.120 / image
 	// https://docs.anthropic.com/en/docs/about-claude/models
-	"claude-instant-1.2":         0.8 / 1000 * USD,
-	"claude-2.0":                 8.0 / 1000 * USD,
-	"claude-2.1":                 8.0 / 1000 * USD,
-	"claude-3-haiku-20240307":    0.25 / 1000 * USD,
-	"claude-3-5-haiku-20241022":  1.0 / 1000 * USD,
-	"claude-3-5-haiku-latest":    1.0 / 1000 * USD,
-	"claude-3-sonnet-20240229":   3.0 / 1000 * USD,
-	"claude-3-5-sonnet-20240620": 3.0 / 1000 * USD,
-	"claude-3-5-sonnet-20241022": 3.0 / 1000 * USD,
-	"claude-3-5-sonnet-latest":   3.0 / 1000 * USD,
-	"claude-3-opus-20240229":     15.0 / 1000 * USD,
+	"claude-instant-1.2":                  0.8 / 1000 * USD,
+	"claude-2.0":                          8.0 / 1000 * USD,
+	"claude-2.1":                          8.0 / 1000 * USD,
+	"claude-3-haiku-20240307":             0.25 / 1000 * USD,
+	"claude-3-5-haiku-20241022":           1.0 / 1000 * USD,
+	"claude-3-5-haiku-latest":             1.0 / 1000 * USD,
+	"claude-3-sonnet-20240229":            3.0 / 1000 * USD,
+	"claude-3-5-sonnet-20240620":          3.0 / 1000 * USD,
+	"claude-3-5-sonnet-20241022":          3.0 / 1000 * USD,
+	"claude-3-5-sonnet-latest":            3.0 / 1000 * USD,
+	"claude-3-opus-20240229":              15.0 / 1000 * USD,
+	"claude-3-7-sonnet-20250219":          3.0 / 1000 * USD,
+	"claude-3-7-sonnet-20250219-thinking": 3.0 / 1000 * USD,
 	// https://cloud.baidu.com/doc/WENXINWORKSHOP/s/hlrk4akp7
-	"ERNIE-4.0-8K":       0.120 * RMB,
-	"ERNIE-3.5-8K":       0.012 * RMB,
-	"ERNIE-3.5-8K-0205":  0.024 * RMB,
-	"ERNIE-3.5-8K-1222":  0.012 * RMB,
-	"ERNIE-Bot-8K":       0.024 * RMB,
-	"ERNIE-3.5-4K-0205":  0.012 * RMB,
-	"ERNIE-Speed-8K":     0.004 * RMB,
-	"ERNIE-Speed-128K":   0.004 * RMB,
-	"ERNIE-Lite-8K-0922": 0.008 * RMB,
-	"ERNIE-Lite-8K-0308": 0.003 * RMB,
-	"ERNIE-Tiny-8K":      0.001 * RMB,
-	"BLOOMZ-7B":          0.004 * RMB,
-	"Embedding-V1":       0.002 * RMB,
-	"bge-large-zh":       0.002 * RMB,
-	"bge-large-en":       0.002 * RMB,
-	"tao-8k":             0.002 * RMB,
+	"ERNIE-4.5-8K-Preview": 0.285 * RMB,
+	"ERNIE-4.0-8K":         0.120 * RMB,
+	"ERNIE-3.5-8K":         0.012 * RMB,
+	"ERNIE-3.5-8K-0205":    0.024 * RMB,
+	"ERNIE-3.5-8K-1222":    0.012 * RMB,
+	"ERNIE-Bot-8K":         0.024 * RMB,
+	"ERNIE-3.5-4K-0205":    0.012 * RMB,
+	"ERNIE-Speed-8K":       0.004 * RMB,
+	"ERNIE-Speed-128K":     0.004 * RMB,
+	"ERNIE-Lite-8K-0922":   0.008 * RMB,
+	"ERNIE-Lite-8K-0308":   0.003 * RMB,
+	"ERNIE-Tiny-8K":        0.001 * RMB,
+	"BLOOMZ-7B":            0.004 * RMB,
+	"Embedding-V1":         0.002 * RMB,
+	"bge-large-zh":         0.002 * RMB,
+	"bge-large-en":         0.002 * RMB,
+	"tao-8k":               0.002 * RMB,
 	// https://ai.google.dev/pricing
 	// https://cloud.google.com/vertex-ai/generative-ai/pricing
 	// "gemma-2-2b-it":                       0,
@@ -723,6 +728,7 @@ func UpdateCompletionRatioByJSONString(jsonStr string) error {
 }
 
 func GetCompletionRatio(name string, channelType int) float64 {
+	lowercaseName := strings.ToLower(name)
 	if strings.HasPrefix(name, "qwen-") && strings.HasSuffix(name, "-internet") {
 		name = strings.TrimSuffix(name, "-internet")
 	}
@@ -761,8 +767,13 @@ func GetCompletionRatio(name string, channelType int) float64 {
 			strings.HasSuffix(name, "preview") {
 			return 3
 		}
+		// gpt-4.5-preview匹配
+		if strings.HasPrefix(name, "gpt-4.5-preview") {
+			return 2
+		}
 		return 2
 	}
+
 	// including o1, o1-preview, o1-mini
 	if strings.HasPrefix(name, "o1") {
 		return 4
@@ -784,6 +795,19 @@ func GetCompletionRatio(name string, channelType int) float64 {
 	}
 	if strings.HasPrefix(name, "deepseek-") {
 		return 2
+	}
+	if strings.HasPrefix(name, "ERNIE-Speed-") {
+		return 2
+	} else if strings.HasPrefix(name, "ERNIE-Lite-") {
+		return 2
+	} else if strings.HasPrefix(name, "ERNIE-Character") {
+		return 2
+	} else if strings.HasPrefix(name, "ERNIE-Functions") {
+		return 2
+	} else if strings.HasPrefix(lowercaseName, "ernie-4.0-turbo") {
+		return 3
+	} else if strings.HasPrefix(lowercaseName, "ernie-") {
+		return 4
 	}
 
 	switch name {
@@ -832,4 +856,18 @@ func GetCompletionRatio(name string, channelType int) float64 {
 	}
 
 	return 1
+}
+
+var OneTimeQuota = map[string]float64{
+	"grok-3-all":            0.0126 * 1000 * USD,
+	"grok-3-deepsearch-all": 0.0151 * 1000 * USD,
+	"grok-3-reasoner-all":   0.0151 * 1000 * USD,
+}
+
+// 获取单次请求的配额,有些模型是按照单次请求收费的
+func GetOneTimeQuota(name string) float64 {
+	if quota, ok := OneTimeQuota[name]; ok {
+		return quota
+	}
+	return 0
 }

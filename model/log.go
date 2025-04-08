@@ -33,6 +33,7 @@ type Log struct {
 	ElapsedTime       int64  `json:"elapsed_time" gorm:"default:0"` // unit is ms
 	IsStream          bool   `json:"is_stream" gorm:"default:false"`
 	SystemPromptReset bool   `json:"system_prompt_reset" gorm:"default:false"`
+	IP                string `json:"ip" gorm:"default:''"`
 }
 
 const (
@@ -56,7 +57,7 @@ func recordLogHelper(ctx context.Context, log *Log) {
 		logger.Error(ctx, "failed to record log: "+err.Error())
 		return
 	}
-	logger.Infof(ctx, "record log: %+v", log)
+	//logger.Infof(ctx, "record log: %+v", log)
 }
 
 func RecordLog(ctx context.Context, userId int, logType int, content string) {
