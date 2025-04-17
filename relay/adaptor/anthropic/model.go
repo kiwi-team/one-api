@@ -94,6 +94,7 @@ type Delta struct {
 	PartialJson  string  `json:"partial_json,omitempty"`
 	StopReason   *string `json:"stop_reason"`
 	StopSequence *string `json:"stop_sequence"`
+	Thinking     string  `json:"thinking"`
 }
 
 type StreamResponse struct {

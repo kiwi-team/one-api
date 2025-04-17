@@ -156,6 +156,7 @@ func ConvertRequest(textRequest model.GeneralOpenAIRequest) *Request {
 func StreamResponseClaude2OpenAI(claudeResponse *StreamResponse) (*openai.ChatCompletionsStreamResponse, *Response) {
 	var response *Response
 	var responseText string
+	var reasoningContent string
 	var stopReason string
 	tools := make([]model.Tool, 0)
 
@@ -165,6 +166,7 @@ func StreamResponseClaude2OpenAI(claudeResponse *StreamResponse) (*openai.ChatCo
 	case "content_block_start":
 		if claudeResponse.ContentBlock != nil {
 			responseText = claudeResponse.ContentBlock.Text
+			reasoningContent = claudeResponse.ContentBlock.Thinking
 			if claudeResponse.ContentBlock.Type == "tool_use" {
 				tools = append(tools, model.Tool{
 					Id:   claudeResponse.ContentBlock.Id,
@@ -179,6 +181,7 @@ func StreamResponseClaude2OpenAI(claudeResponse *StreamResponse) (*openai.ChatCo
 	case "content_block_delta":
 		if claudeResponse.Delta != nil {
 			responseText = claudeResponse.Delta.Text
+			reasoningContent = claudeResponse.Delta.Thinking
 			if claudeResponse.Delta.Type == "input_json_delta" {
 				tools = append(tools, model.Tool{
 					Function: model.Function{
@@ -199,6 +202,7 @@ func StreamResponseClaude2OpenAI(claudeResponse *StreamResponse) (*openai.ChatCo
 	}
 	var choice openai.ChatCompletionsStreamResponseChoice
 	choice.Delta.Content = responseText
+	choice.Delta.ReasoningContent = reasoningContent
 	if len(tools) > 0 {
 		choice.Delta.Content = nil // compatible with other OpenAI derivative applications, like LobeOpenAICompatibleFactory ...
 		choice.Delta.ToolCalls = tools
