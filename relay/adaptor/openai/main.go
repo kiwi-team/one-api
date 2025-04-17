@@ -161,6 +161,24 @@ func Handler(c *gin.Context, resp *http.Response, promptTokens int, modelName st
 		return ErrorWrapper(err, "close_response_body_failed", http.StatusInternalServerError), nil
 	}
 	err = json.Unmarshal(responseBody, &textResponse)
+	isGLMZ1 := strings.HasPrefix(modelName, "glm-z1")
+	if textResponse.Choices != nil && len(textResponse.Choices) > 0 && isGLMZ1 {
+		content := textResponse.Choices[0].Message.StringContent()
+		// Extract content between <think> tags
+		/*
+			(?s) 是正则表达式的 "single line" 模式标志 它让 . 能够匹配任何字符，包括换行符 \n 这样就能正确匹配多行的 <think> 内容了
+		*/
+		thinkRegex := regexp.MustCompile(`(?s)<think>(.*?)</think>`)
+		matches := thinkRegex.FindStringSubmatch(content)
+		if len(matches) > 1 {
+			// Set the reasoning content
+			textResponse.Choices[0].Message.ReasoningContent = matches[1]
+			// Remove the <think> section from the content
+			content = thinkRegex.ReplaceAllString(content, "")
+		}
+		// Set the cleaned content
+		textResponse.Choices[0].Message.Content = content
+	}
 	if err != nil {
 		return ErrorWrapper(err, "unmarshal_response_body_failed", http.StatusInternalServerError), nil
 	}
@@ -172,7 +190,12 @@ func Handler(c *gin.Context, resp *http.Response, promptTokens int, modelName st
 	}
 
 	// Reset response body
-	resp.Body = io.NopCloser(bytes.NewBuffer(responseBody))
+	if isGLMZ1 {
+		jsonResponse, _ := json.Marshal(textResponse)
+		resp.Body = io.NopCloser(bytes.NewBuffer(jsonResponse))
+	} else {
+		resp.Body = io.NopCloser(bytes.NewBuffer(responseBody))
+	}
 
 	// We shouldn't set the header before we parse the response body, because the parse part may fail.
 	// And then we will have to send an error response, but in this case, the header has already been set.

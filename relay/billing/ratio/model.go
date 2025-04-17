@@ -55,7 +55,13 @@ var ModelRatio = map[string]float64{
 	"gpt-3.5-turbo-0125":         0.25, // $0.0005 / 1K tokens
 	"gpt-4.5-preview":            37.5,
 	"gpt-4.5-preview-2025-02-27": 37.5,
-	"o1":                         7.5, // $15.00 / 1M input tokens
+	"gpt-4.1-nano-2025-04-14":    0.00015 * USD, // $0.00015 / 1K tokens
+	"gpt-4.1-mini-2025-04-14":    0.0006 * USD,
+	"gpt-4.1-2025-04-14":         0.003 * USD,
+	"gpt-4.1":                    0.003 * USD,   // $0.00015 / 1K tokens
+	"gpt-4.1-mini":               0.0006 * USD,  // $0.00015 / 1K tokens
+	"gpt-4.1-nano":               0.00015 * USD, // $0.00015 / 1K tokens
+	"o1":                         7.5,           // $15.00 / 1M input tokens
 	"o1-2024-12-17":              7.5,
 	"o1-preview":                 7.5, // $15.00 / 1M input tokens
 	"o1-preview-2024-09-12":      7.5,
@@ -63,8 +69,10 @@ var ModelRatio = map[string]float64{
 	"o1-mini-2024-09-12":         1.5,
 	"o3-mini":                    1.5, // $3.00 / 1M input tokens
 	"o3-mini-2025-01-31":         1.5,
-	"davinci-002":                1,   // $0.002 / 1K tokens
-	"babbage-002":                0.2, // $0.0004 / 1K tokens
+	"o3":                         1.5 * 0.01 * USD,       // $10 / 1M input tokens  cloaseai再*1.5
+	"o4-mini":                    1.5 * 1.1 / 1000 * USD, // $1.1 / 1M input tokens cloaseai再*1.5
+	"davinci-002":                1,                      // $0.002 / 1K tokens
+	"babbage-002":                0.2,                    // $0.0004 / 1K tokens
 	"text-ada-001":               0.2,
 	"text-babbage-001":           0.25,
 	"text-curie-001":             1,
@@ -143,29 +151,34 @@ var ModelRatio = map[string]float64{
 	"gemini-2.5-pro-preview-03-25":        0.764 / 1000 * USD, // panda的计费  提示 $0.764 / 1M tokens
 	"aqa":                                 1,
 	// https://open.bigmodel.cn/pricing
-	"glm-zero-preview": 0.01 * RMB,
-	"glm-4-plus":       0.05 * RMB,
-	"glm-4-0520":       0.1 * RMB,
-	"glm-4-airx":       0.01 * RMB,
-	"glm-4-air":        0.0005 * RMB,
-	"glm-4-long":       0.001 * RMB,
-	"glm-4-flashx":     0.0001 * RMB,
-	"glm-4-flash":      0,
-	"glm-4":            0.1 * RMB,   // deprecated model, available until 2025/06
-	"glm-3-turbo":      0.001 * RMB, // deprecated model, available until 2025/06
-	"glm-4v-plus":      0.004 * RMB,
-	"glm-4v":           0.05 * RMB,
-	"glm-4v-flash":     0,
-	"cogview-3-plus":   0.06 * RMB,
-	"cogview-3":        0.1 * RMB,
-	"cogview-3-flash":  0,
-	"cogviewx":         0.5 * RMB,
-	"cogviewx-flash":   0,
-	"charglm-4":        0.001 * RMB,
-	"emohaa":           0.015 * RMB,
-	"codegeex-4":       0.0001 * RMB,
-	"embedding-2":      0.0005 * RMB,
-	"embedding-3":      0.0005 * RMB,
+	"glm-z1-air":         0.0005 * RMB,
+	"glm-z1-airx":        0.005 * RMB,
+	"glm-z1-flash":       0,
+	"glm-4-air-250414":   0.0005 * RMB,
+	"glm-4-flash-250414": 0,
+	"glm-zero-preview":   0.01 * RMB,
+	"glm-4-plus":         0.05 * RMB,
+	"glm-4-0520":         0.1 * RMB,
+	"glm-4-airx":         0.01 * RMB,
+	"glm-4-air":          0.0005 * RMB,
+	"glm-4-long":         0.001 * RMB,
+	"glm-4-flashx":       0.0001 * RMB,
+	"glm-4-flash":        0,
+	"glm-4":              0.1 * RMB,   // deprecated model, available until 2025/06
+	"glm-3-turbo":        0.001 * RMB, // deprecated model, available until 2025/06
+	"glm-4v-plus":        0.004 * RMB,
+	"glm-4v":             0.05 * RMB,
+	"glm-4v-flash":       0,
+	"cogview-3-plus":     0.06 * RMB,
+	"cogview-3":          0.1 * RMB,
+	"cogview-3-flash":    0,
+	"cogviewx":           0.5 * RMB,
+	"cogviewx-flash":     0,
+	"charglm-4":          0.001 * RMB,
+	"emohaa":             0.015 * RMB,
+	"codegeex-4":         0.0001 * RMB,
+	"embedding-2":        0.0005 * RMB,
+	"embedding-3":        0.0005 * RMB,
 	// https://help.aliyun.com/zh/dashscope/developer-reference/tongyi-thousand-questions-metering-and-billing
 	"qwen-turbo":                    0.0003 * RMB,
 	"qwen-turbo-latest":             0.0003 * RMB,
@@ -757,6 +770,13 @@ func GetCompletionRatio(name string, channelType int) float64 {
 		}
 		return 4.0 / 3.0
 	}
+	if strings.HasPrefix(name, "gpt-4.1") {
+		return 4
+	}
+	if name == "o3" || name == "o4-mini" {
+		return 4
+	}
+
 	if strings.HasPrefix(name, "gpt-4") {
 		if strings.HasPrefix(name, "gpt-4o") {
 			if name == "gpt-4o-2024-05-13" {

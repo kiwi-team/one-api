@@ -3,6 +3,11 @@ package zhipu
 // https://open.bigmodel.cn/pricing
 
 var ModelList = []string{
+	"glm-z1-air",
+	"glm-z1-flash",
+	"glm-z1-airx",
+	"glm-4-air-250414",
+	"glm-4-flash-250414",
 	"glm-4-plus",
 	"chatglm_turbo", "chatglm_pro", "chatglm_std", "chatglm_lite",
 	"glm-zero-preview", "glm-4-0520", "glm-4-airx",
@@ -11,6 +16,7 @@ var ModelList = []string{
 	"glm-4v-plus", "glm-4v", "glm-4v-flash",
 	"cogview-3-plus", "cogview-3", "cogview-3-flash",
 	"cogviewx", "cogviewx-flash",
+	"cogview-4-250304",
 	"charglm-4", "emohaa", "codegeex-4",
 	"embedding-2", "embedding-3",
 }

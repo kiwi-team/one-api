@@ -1,6 +1,14 @@
 package openai
 
 var ModelList = []string{
+	"o3",
+	"o4-mini",
+	"gpt-4.1-nano-2025-04-14",
+	"gpt-4.1-nano",
+	"gpt-4.1-mini-2025-04-14",
+	"gpt-4.1-mini",
+	"gpt-4.1-2025-04-14",
+	"gpt-4.1",
 	"gpt-4.5-preview-2025-02-27",
 	"o1-pro",
 	"gpt-3.5-turbo", "gpt-3.5-turbo-0301", "gpt-3.5-turbo-0613", "gpt-3.5-turbo-1106", "gpt-3.5-turbo-0125",
