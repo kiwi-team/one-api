@@ -77,6 +77,8 @@ var ModelList = []string{
 	"gpt-4-1106-preview",
 	"gpt-4-32k",
 	"tts-1-hd-1106",
+	"claude-3-7-sonnet-20250219",
+	"claude-3-7-sonnet-20250219#thinking",
 	"claude-3-5-sonnet-20241022",
 	"claude-3-opus-20240229",
 	"gpt-4o-mini-2024-07-18",
