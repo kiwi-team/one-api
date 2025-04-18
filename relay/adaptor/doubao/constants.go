@@ -10,6 +10,7 @@ var ModelList = []string{
 	"doubao-1-5-ui-tars-250328",
 	"doubao-1-5-pro-32k-250115",
 	"doubao-1-5-pro-256k-250115",
+	"doubao-1-5-thinking-pro-m-250415",
 	"Doubao-pro-128k",
 	"Doubao-pro-32k",
 	"Doubao-pro-4k",
