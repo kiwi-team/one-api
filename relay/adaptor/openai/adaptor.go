@@ -104,6 +104,13 @@ func (a *Adaptor) ConvertRequest(c *gin.Context, relayMode int, request *model.G
 	if a.ChannelType == channeltype.Baidu2 {
 		request.Model = strings.ToLower(request.Model)
 	}
+	// 走panda渠道的时候,如果请求是 claude-3-7-sonnet-20250219 并且开启了 thinking，则把模型名改为 claude-3-7-sonnet-20250219#thinking
+	if a.ChannelType == channeltype.Panda && strings.HasPrefix(request.Model, "claude-3-7-sonnet-20250219") && request.Thinking != nil && request.Thinking.Type == "enabled" {
+		request.Model = request.Model + "#thinking"
+		if request.Thinking.BudgetTokens > request.MaxTokens {
+			request.MaxTokens = request.Thinking.BudgetTokens + 1
+		}
+	}
 	if strings.HasPrefix(request.Model, "gemini") {
 		//  兼容爱果果/panda的请求把 audio_url, video_url 转换为 image_url
 		if a.ChannelType == channeltype.Aiguoguo || a.ChannelType == channeltype.Panda {
