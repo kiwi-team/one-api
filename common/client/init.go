@@ -13,6 +13,7 @@ import (
 var HTTPClient *http.Client
 var ImpatientHTTPClient *http.Client
 var UserContentRequestHTTPClient *http.Client
+var RetryHTTPClient *RetryableHTTPClient
 
 func Init() {
 	if config.UserContentRequestProxy != "" {
@@ -58,4 +59,7 @@ func Init() {
 		Timeout:   5 * time.Second,
 		Transport: transport,
 	}
+
+	// 初始化重试客户端
+	RetryHTTPClient = NewRetryableHTTPClient(HTTPClient, DefaultRetryConfig())
 }

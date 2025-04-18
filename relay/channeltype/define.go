@@ -64,5 +64,6 @@ const (
 	AliBailian             // 60
 	OpenAICompatible       // 61
 	GeminiOpenAICompatible // 62
-	Dummy                  // 63
+	Sensenova              // 63
+	Dummy                  // 64
 )

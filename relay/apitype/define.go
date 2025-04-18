@@ -26,6 +26,6 @@ const (
 	Midjourney
 	Ailab
 	Replicate
-
+	Sensenova
 	Dummy // this one is only for count, do not add any channel after this
 )

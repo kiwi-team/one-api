@@ -638,6 +638,18 @@ var ModelRatio = map[string]float64{
 	"x-ai/grok-beta":                                  7.5,
 	"x-ai/grok-vision-beta":                           7.5,
 	"xwin-lm/xwin-lm-70b":                             1.875,
+
+	//https://console.sensecore.cn/micro/help/docs/model-as-a-service/nova/pricing/
+	"SenseNova-V6-Pro":      0.003 * RMB, // 0.003元/千tokens
+	"SenseNova-V6-Turbo":    0.0015 * RMB,
+	"SenseNova-V6-Reasoner": 0.004 * RMB,
+
+	// https://console.volcengine.com/ark/region:ark+cn-beijing/model/detail?Id=doubao-1-5-thinking-prodoubao
+	"doubao-1-5-thinking-pro-250415":   0.002 * RMB,
+	"doubao-1-5-vision-lite-250315":    0.0015 * RMB,
+	"doubao-1-5-vision-pro-250328":     0.0030 * RMB,
+	"doubao-1-5-vision-pro-32k-250115": 0.0015 * RMB,
+	"doubao-1-5-ui-tars-250328":        0.0018 * RMB,
 }
 
 var CompletionRatio = map[string]float64{
@@ -743,6 +755,22 @@ func UpdateCompletionRatioByJSONString(jsonStr string) error {
 
 func GetCompletionRatio(name string, channelType int) float64 {
 	lowercaseName := strings.ToLower(name)
+	if lowercaseName == "sensenova-v6-pro" || lowercaseName == "sensenova-v6-turbo" {
+		return 3
+	}
+	if lowercaseName == "sensenova-v6-reasoner" {
+		return 4
+	}
+
+	if strings.HasPrefix(name, "doubao-") {
+		if lowercaseName == "doubao-1.5-ui-tars-250328" {
+			return 0.006 / 0.0018
+		} else if lowercaseName == "doubao-1-5-thinking-pro-250415" {
+			return 4
+		}
+		return 3
+	}
+
 	if strings.HasPrefix(name, "qwen-") && strings.HasSuffix(name, "-internet") {
 		name = strings.TrimSuffix(name, "-internet")
 	}

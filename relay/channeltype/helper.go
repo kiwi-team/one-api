@@ -55,6 +55,8 @@ func ToAPIType(channelType int) int {
 		apiType = apitype.Midjourney
 	case Ailab:
 		apiType = apitype.Ailab
+	case Sensenova:
+		apiType = apitype.Sensenova
 	}
 
 	return apiType
