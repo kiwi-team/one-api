@@ -149,7 +149,8 @@ var ModelRatio = map[string]float64{
 	"gemini-2.0-flash-thinking-exp-01-21": 0.075 * MILLI_USD,
 	"gemini-2.0-pro-exp-02-05":            1.25 * MILLI_USD,
 	"gemini-2.5-pro-preview-03-25":        0.764 / 1000 * USD, // panda的计费  提示 $0.764 / 1M tokens
-	"aqa":                                 1,
+	//"gemini-2.5-flash-preview-04-17":      0.075 * MILLI_USD,
+	"aqa": 1,
 	// https://open.bigmodel.cn/pricing
 	"glm-z1-air":         0.0005 * RMB,
 	"glm-z1-airx":        0.005 * RMB,
