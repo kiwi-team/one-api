@@ -3,6 +3,8 @@ package panda
 // https://api.panda-v.com/pricing
 
 var ModelList = []string{
+	"gpt-4.5-preview",
+	"gpt-4.5-preview-2025-02-27",
 	"o3",
 	"o4-mini",
 	"gpt-4.1-nano-2025-04-14",

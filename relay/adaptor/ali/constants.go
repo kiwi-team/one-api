@@ -2,7 +2,7 @@ package ali
 
 var ModelList = []string{
 	"qwq-32b",
-	"qwen-max-2025-01-25",
+	"qwen-max-2025-01-25", // 又称qwen-max-0125、Qwen2.5-Max
 	"qwen-turbo", "qwen-turbo-latest",
 	"qwen-plus", "qwen-plus-latest",
 	"qwen-max", "qwen-max-latest",
