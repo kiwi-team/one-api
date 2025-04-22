@@ -2,6 +2,7 @@ package aiguoguo
 
 var ModelList = []string{
 	"gemini-2.5-pro-exp-03-25",
+	"gemini-2.0-flash-exp-image-generation",
 	"gemini-1.5-flash",
 	"ada",
 	"babbage",
