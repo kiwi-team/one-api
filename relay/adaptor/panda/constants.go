@@ -3,6 +3,7 @@ package panda
 // https://api.panda-v.com/pricing
 
 var ModelList = []string{
+	"gemini-2.5-flash-preview-04-17",
 	"gpt-4.5-preview",
 	"gpt-4.5-preview-2025-02-27",
 	"o3",
