@@ -21,6 +21,7 @@ var ModelList = []string{
 	"hunyuan-turbos-20250226",
 	"hunyuan-turbos-latest",
 	"hunyuan-t1-20250321",
+	"hunyuan-t1-20250403",
 	"hunyuan-t1-latest",
 	"hunyuan-embedding",
 }
