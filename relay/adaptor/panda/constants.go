@@ -9,6 +9,7 @@ var ModelList = []string{
 	"gpt-4.5-preview-2025-02-27",
 	"o3",
 	"o4-mini",
+	"o4-mini-2025-04-16",
 	"gpt-4.1-nano-2025-04-14",
 	"gpt-4.1-nano",
 	"gpt-4.1-mini-2025-04-14",

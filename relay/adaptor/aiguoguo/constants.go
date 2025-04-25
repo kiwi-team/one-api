@@ -43,6 +43,7 @@ var ModelList = []string{
 	"gemini-exp-1206",
 	"gemini-pro",
 	"gemini-pro-vision",
+	"gpt-image-1",
 	"gpt-3.5-turbo",
 	"gpt-3.5-turbo-0125",
 	"gpt-3.5-turbo-0301",

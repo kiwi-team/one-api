@@ -3,6 +3,7 @@ package openai
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 
@@ -43,6 +44,7 @@ func ImageHandler(c *gin.Context, resp *http.Response) (*model.ErrorWithStatusCo
 			return ErrorWrapper(err, "longCat-t2i-marshal_response_body_failed", http.StatusInternalServerError), nil
 		}
 	} else {
+		fmt.Println("responseBody", string(responseBody))
 		err = json.Unmarshal(responseBody, &imageResponse)
 	}
 	if err != nil {

@@ -127,6 +127,12 @@ var ValidThemes = map[string]bool{
 	"air":     true,
 }
 
+var S3Bucket = ""
+var S3Region = ""
+var S3AK = ""
+var S3SK = ""
+var S3Endpoint = ""
+
 // All duration's unit is seconds
 // Shouldn't larger then RateLimitKeyExpirationDuration
 var (

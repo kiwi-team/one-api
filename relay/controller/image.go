@@ -10,13 +10,19 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/gin-gonic/gin"
 
 	"github.com/songquanpeng/one-api/common"
+	"github.com/songquanpeng/one-api/common/config"
 	"github.com/songquanpeng/one-api/common/ctxkey"
+	"github.com/songquanpeng/one-api/common/helper"
 	"github.com/songquanpeng/one-api/common/logger"
 	"github.com/songquanpeng/one-api/model"
 	"github.com/songquanpeng/one-api/relay"
+	"github.com/songquanpeng/one-api/relay/adaptor/aws/utils"
 	"github.com/songquanpeng/one-api/relay/adaptor/openai"
 	billingratio "github.com/songquanpeng/one-api/relay/billing/ratio"
 	"github.com/songquanpeng/one-api/relay/channeltype"
@@ -227,7 +233,6 @@ func RelayImageHelper(c *gin.Context, relayMode int) *relaymodel.ErrorWithStatus
 			logger.SysError("error update user quota cache: " + err.Error())
 		}
 		if quota != 0 {
-			tokenName := c.GetString(ctxkey.TokenName)
 			logContent := fmt.Sprintf("模型倍率 %.2f，分组倍率 %.2f", modelRatio, groupRatio)
 			milliseconds := 0
 			if startTime, ok := ctx.Value(startTimeKey).(time.Time); ok {
@@ -238,22 +243,70 @@ func RelayImageHelper(c *gin.Context, relayMode int) *relaymodel.ErrorWithStatus
 			// Convert textRequest to JSON string
 			textRequestJSON, _ := json.Marshal(imageRequest)
 			requestBodyContent := string(textRequestJSON)
-			responseBodyContent := string(responseBodyBytes)
+			responseBodyContent := "" //string(responseBodyBytes)
+			imageResponse := openai.ImageResponse{}
+			err = json.Unmarshal(responseBodyBytes, &imageResponse)
+			if err != nil {
+				logger.Errorf(ctx, "Failed to unmarshal image response: %s", err.Error())
+			}
+			promptTokens := imageResponse.Usage.PromptTokens + imageResponse.Usage.InputTokens
+			completionTokens := imageResponse.Usage.CompletionTokens + imageResponse.Usage.OutputTokens
 
-			model.RecordConsumeLog(ctx, meta.UserId, meta.ChannelId, 0, 0, imageRequest.Model, tokenName, quota, logContent, milliseconds, requestBodyContent, responseBodyContent)
-			/*
-				logContent := fmt.Sprintf("倍率：%.2f × %.2f", modelRatio, groupRatio)
-				model.RecordConsumeLog(ctx, &model.Log{
-					UserId:           meta.UserId,
-					ChannelId:        meta.ChannelId,
-					PromptTokens:     0,
-					CompletionTokens: 0,
-					ModelName:        imageRequest.Model,
-					TokenName:        tokenName,
-					Quota:            int(quota),
-					Content:          logContent,
-				})
-			*/
+			// Create S3 client
+			s3Client := s3.New(s3.Options{
+				Region:      config.S3Region,
+				Credentials: aws.NewCredentialsCache(credentials.NewStaticCredentialsProvider(config.S3AK, config.S3SK, "")),
+			})
+
+			for i, item := range imageResponse.Data {
+				if item.Url != "" {
+					//upload to aws s3
+					url, err := utils.UploadImageFromUrlToS3(ctx, s3Client, config.S3Bucket, config.S3Endpoint, item.Url)
+					if err != nil {
+						logger.Errorf(ctx, "Failed to upload image to S3: %s", err.Error())
+						continue
+					}
+					imageResponse.Data[i].Url = url
+				}
+				if item.B64Json != "" {
+					// Check if S3 is configured
+					if config.S3Bucket == "" {
+						logger.Warnf(ctx, "S3 bucket not configured, skipping upload")
+						continue
+					}
+
+					// Upload to S3
+					url, err := utils.UploadBase64ImageToS3(ctx, s3Client, config.S3Bucket, config.S3Endpoint, item.B64Json)
+					if err != nil {
+						logger.Errorf(ctx, "Failed to upload image to S3: %s", err.Error())
+						continue
+					}
+					//item.Url = url
+					//item.B64Json = "" // Clear the base64 data after successful upload
+					imageResponse.Data[i].Url = url
+					imageResponse.Data[i].B64Json = "" // Clear the base64 data after successful upload
+				}
+			}
+			responseBodyContentBytes, _ := json.Marshal(imageResponse)
+			responseBodyContent = string(responseBodyContentBytes)
+
+			model.RecordOneConsumeLog(ctx, &model.Log{
+				UserId:            meta.UserId,
+				ChannelId:         meta.ChannelId,
+				PromptTokens:      promptTokens,
+				CompletionTokens:  completionTokens,
+				ModelName:         imageRequest.Model,
+				TokenName:         meta.TokenName,
+				Quota:             int(quota),
+				Content:           logContent,
+				Milliseconds:      milliseconds,
+				Request:           requestBodyContent,
+				Response:          responseBodyContent,
+				IsStream:          meta.IsStream,
+				ElapsedTime:       helper.CalcElapsedTime(meta.StartTime),
+				SystemPromptReset: false,
+				IP:                meta.IP,
+			})
 			model.UpdateUserUsedQuotaAndRequestCount(meta.UserId, quota)
 			channelId := c.GetInt(ctxkey.ChannelId)
 			model.UpdateChannelUsedQuota(channelId, quota)

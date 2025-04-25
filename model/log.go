@@ -115,6 +115,7 @@ func RecordConsumeLog(ctx context.Context, userId int, channelId int, promptToke
 		Request:          requestBodyContent,
 		Response:         responseBodyContent,
 		RequestId:        requestId,
+		ElapsedTime:      int64(milliseconds),
 	}
 	logList = append(logList, log)
 	now := helper.GetTimestamp()

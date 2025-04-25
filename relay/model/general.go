@@ -26,6 +26,12 @@ type AnthropicThinking struct {
 	BudgetTokens int    `json:"budget_tokens,omitempty"`
 }
 
+// panda 的 reasoning 参数
+type Reasoning struct {
+	Effort    string `json:"effort,omitempty"`
+	MaxTokens *int   `json:"max_tokens,omitempty"`
+}
+
 type GeneralOpenAIRequest struct {
 	Messages            []Message          `json:"messages,omitempty"`
 	Model               string             `json:"model,omitempty"`
@@ -58,6 +64,7 @@ type GeneralOpenAIRequest struct {
 	Size                string             `json:"size,omitempty"`
 	NumCtx              int                `json:"num_ctx,omitempty"`
 	Thinking            *AnthropicThinking `json:"thinking,omitempty"`
+	Reasoning           *Reasoning         `json:"reasoning,omitempty"`
 	// https://platform.openai.com/docs/api-reference/chat/create
 	//Messages            []Message       `json:"messages,omitempty"`
 	//Model               string          `json:"model,omitempty"`

@@ -71,6 +71,7 @@ var ModelRatio = map[string]float64{
 	"o3-mini-2025-01-31":         1.5,
 	"o3":                         1.5 * 0.01 * USD,       // $10 / 1M input tokens  cloaseai再*1.5
 	"o4-mini":                    1.5 * 1.1 / 1000 * USD, // $1.1 / 1M input tokens cloaseai再*1.5
+	"o4-mini-2025-04-16":         1.5 * 1.1 / 1000 * USD, // $1.1 / 1M input tokens cloaseai再*1.5
 	"davinci-002":                1,                      // $0.002 / 1K tokens
 	"babbage-002":                0.2,                    // $0.0004 / 1K tokens
 	"text-ada-001":               0.2,

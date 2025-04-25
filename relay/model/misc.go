@@ -7,6 +7,11 @@ type Usage struct {
 	InputTokens             int                      `json:"input_tokens,omitempty" default:"0"`
 	OutputTokens            int                      `json:"output_tokens,omitempty" default:"0"`
 	CompletionTokensDetails *CompletionTokensDetails `json:"completion_tokens_details,omitempty"`
+	InputTokensDetails      *InputTokensDetails      `json:"input_tokens_details,omitempty"`
+}
+type InputTokensDetails struct {
+	ImageTokens int `json:"image_tokens"`
+	TextTokens  int `json:"text_tokens"`
 }
 
 type CompletionTokensDetails struct {

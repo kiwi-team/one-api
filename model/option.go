@@ -253,6 +253,16 @@ func updateOptionMap(key string, value string) (err error) {
 		config.ContentCheckPerLength, _ = strconv.Atoi(value)
 	case "ContentCheckPrefixLength":
 		config.ContentCheckPrefixLength, _ = strconv.Atoi(value)
+	case "S3Bucket":
+		config.S3Bucket = value
+	case "S3Region":
+		config.S3Region = value
+	case "S3AK":
+		config.S3AK = value
+	case "S3SK":
+		config.S3SK = value
+	case "S3Endpoint":
+		config.S3Endpoint = value
 	}
 	return err
 }

@@ -111,6 +111,19 @@ func (a *Adaptor) ConvertRequest(c *gin.Context, relayMode int, request *model.G
 			request.MaxTokens = request.Thinking.BudgetTokens + 1
 		}
 	}
+	// 走panda的渠道， gemini-2.5-flash-preview-04-17 开启 thinking 要按照panda的格式来传参数
+	if a.ChannelType == channeltype.Panda && strings.HasPrefix(request.Model, "gemini-2.5-flash-preview-04-17") && request.Thinking != nil {
+		if request.Thinking.Type == "enabled" && request.Thinking.BudgetTokens >= 0 {
+			request.Reasoning = &model.Reasoning{
+				MaxTokens: &request.Thinking.BudgetTokens,
+			}
+		} else if request.Thinking.Type != "enabled" {
+			maxTokens := 0
+			request.Reasoning = &model.Reasoning{
+				MaxTokens: &maxTokens,
+			}
+		}
+	}
 	if strings.HasPrefix(request.Model, "gemini") {
 		//  兼容爱果果/panda的请求把 audio_url, video_url 转换为 image_url
 		if a.ChannelType == channeltype.Aiguoguo || a.ChannelType == channeltype.Panda {

@@ -67,6 +67,18 @@ func ConvertRequest(textRequest model.GeneralOpenAIRequest) *ChatRequest {
 			MaxOutputTokens: textRequest.MaxTokens,
 		},
 	}
+	if textRequest.Thinking != nil {
+		if textRequest.Thinking.BudgetTokens > 0 && textRequest.Thinking.Type == "enabled" {
+			geminiRequest.GenerationConfig.ThinkingConfig = &ThinkingConfig{
+				ThinkingBudget: &textRequest.Thinking.BudgetTokens,
+			}
+		} else if textRequest.Thinking.Type != "enabled" {
+			budgetTokens := 0
+			geminiRequest.GenerationConfig.ThinkingConfig = &ThinkingConfig{
+				ThinkingBudget: &budgetTokens,
+			}
+		}
+	}
 	if textRequest.ResponseFormat != nil {
 		if mimeType, ok := mimeTypeMap[textRequest.ResponseFormat.Type]; ok {
 			geminiRequest.GenerationConfig.ResponseMimeType = mimeType
