@@ -3,6 +3,8 @@ package doubao
 // https://console.volcengine.com/ark/region:ark+cn-beijing/model
 
 var ModelList = []string{
+	"deepseek-v3-250324",
+	"deepseek-r1-250120",
 	"doubao-1-5-vision-lite-250315",
 	"doubao-1-5-vision-pro-250328",
 	"doubao-1-5-vision-pro-32k-250115",
