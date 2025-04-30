@@ -107,7 +107,7 @@ func IntMax(a int, b int) int {
 }
 
 func GenRequestID() string {
-	return GetTimeString() + random.GetRandomNumberString(8)
+	return "toio_" + GetTimeString() + random.GetRandomNumberString(8)
 }
 
 func SetRequestID(ctx context.Context, id string) context.Context {
@@ -143,6 +143,11 @@ func AssignOrDefault(value string, defaultValue string) string {
 }
 
 func MessageWithRequestId(message string, id string) string {
+	// 对错误信息进行处理
+	// 如果出现panda，closeai，提示上游异常
+	if strings.Contains(message, "panda") {
+		message = "上游服务繁忙,请稍后再试"
+	}
 	return fmt.Sprintf("%s (request id: %s)", message, id)
 }
 
