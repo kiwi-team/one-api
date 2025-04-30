@@ -106,5 +106,6 @@ var ModelList = []string{
 	"gemini-2.0-flash-thinking-exp-1219",
 	"gemini-2.0-pro-exp-02-05",
 	"gemini-2.5-pro-preview-03-25",
+	"gemini-2.5-pro-exp-03-25",
 	"text-moderation-stable",
 }
