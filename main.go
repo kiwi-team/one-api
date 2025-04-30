@@ -11,6 +11,8 @@ import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/joho/godotenv/autoload"
 
+	"runtime/debug"
+
 	"github.com/songquanpeng/one-api/common"
 	"github.com/songquanpeng/one-api/common/client"
 	"github.com/songquanpeng/one-api/common/config"
@@ -107,7 +109,25 @@ func main() {
 
 	// Initialize HTTP server
 	server := gin.New()
-	server.Use(gin.Recovery())
+	//server.Use(gin.Recovery())
+	// 替换默认 Recovery 中间件，确保唯一性
+	server.Use(func(c *gin.Context) {
+		defer func() {
+			if err := recover(); err != nil {
+				// 记录完整堆栈信息 [[2]][[8]]
+				stack := debug.Stack()
+				logger.SysError(fmt.Sprintf("Panic Recovered: %v\n%s", err, stack))
+
+				// 返回标准化错误响应
+				c.AbortWithStatusJSON(500, gin.H{
+					"success": false,
+					"message": "Internal Server Error",
+					"error":   "system_error",
+				})
+			}
+		}()
+		c.Next()
+	})
 	// This will cause SSE not to work!!!
 	//server.Use(gzip.Gzip(gzip.DefaultCompression))
 	server.Use(middleware.RequestId())

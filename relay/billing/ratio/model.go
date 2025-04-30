@@ -24,6 +24,11 @@ var modelRatioLock sync.RWMutex
 // https://openai.com/pricing
 // 1 === $0.002 / 1K tokens
 // 1 === ￥0.014 / 1k tokens
+// ratio == 1 就是1k个tokens，费用是0.002美元
+//  https://platform.openai.com/docs/models/gpt-4.1  1M tokens $2.00, 换算成1k tokens就是0.002美元 输入的ratio就是1
+// https://platform.openai.com/docs/models/o3   1M tokens $10.00, 换算成1k tokens就是0.01美元, 输入的ratio就是 0.01/0.002 = 5
+// https://api-docs.deepseek.com/quick_start/pricing  1M TOKENS INPUT (CACHE MISS)	$0.27 换算成1k tokens就是0.00027美元, 输入的ratio就是 0.00027/0.002 = 0.135
+
 var ModelRatio = map[string]float64{
 	// https://openai.com/pricing
 	"gpt-4":                      15,
@@ -681,6 +686,7 @@ func init() {
 	}
 }
 
+// 如果某个模型，没有配置倍率，就使用默认倍率
 func AddNewMissingRatio(oldRatio string) string {
 	newRatio := make(map[string]float64)
 	err := json.Unmarshal([]byte(oldRatio), &newRatio)

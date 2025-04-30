@@ -45,6 +45,7 @@ func RelayTextHelper(c *gin.Context) *model.ErrorWithStatusCode {
 	ratio := modelRatio * groupRatio
 	// pre-consume quota
 	promptTokens := getPromptTokens(textRequest, meta.Mode)
+	// 预先估计prompt tokens
 	meta.PromptTokens = promptTokens
 	ctx, preConsumedQuota, bizErr := preConsumeQuota(ctx, textRequest, promptTokens, ratio, meta)
 	if bizErr != nil {

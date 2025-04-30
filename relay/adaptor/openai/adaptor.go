@@ -193,10 +193,12 @@ func (a *Adaptor) DoResponse(c *gin.Context, resp *http.Response, meta *meta.Met
 		if usage == nil || usage.TotalTokens == 0 {
 			usage = ResponseText2Usage(responseText, meta.ActualModelName, meta.PromptTokens)
 		}
-		if usage.TotalTokens != 0 && usage.PromptTokens == 0 { // some channels don't return prompt tokens & completion tokens
-			usage.PromptTokens = meta.PromptTokens
-			usage.CompletionTokens = usage.TotalTokens - meta.PromptTokens
-		}
+		// panda data: {"id":"chatcmpl-6887ccb0136e47ab9dc74238955a7d94","object":"chat.completion.chunk","created":1745139709,"model":"claude-3-7-sonnet-20250219","choices":[],"usage":{"prompt_tokens":0,"completion_tokens":1439,"total_tokens":1439,"prompt_tokens_details":{},"completion_tokens_details":{"reasoning_tokens":0,"accepted_prediction_tokens":0,"rejected_prediction_tokens":0}}}
+		// 直接按照第三方的返回来记录，便于追溯
+		//if usage.TotalTokens != 0 && usage.PromptTokens == 0 { // some channels don't return prompt tokens & completion tokens
+		//usage.PromptTokens = meta.PromptTokens
+		//usage.CompletionTokens = usage.TotalTokens - meta.PromptTokens
+		//}
 	} else {
 		switch meta.Mode {
 		case relaymode.ImagesGenerations:

@@ -46,7 +46,7 @@ const (
 )
 
 var logList = []*Log{}
-var maxLogLen = 10
+var maxLogLen = 1
 var preSaveLogAt int64 = 0
 
 func recordLogHelper(ctx context.Context, log *Log) {
