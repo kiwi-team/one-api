@@ -42,6 +42,13 @@ func RelayTextHelper(c *gin.Context) *model.ErrorWithStatusCode {
 	// get model ratio & group ratio
 	modelRatio := billingratio.GetModelRatio(textRequest.Model, meta.ChannelType)
 	groupRatio := billingratio.GetGroupRatio(meta.Group)
+	modelRatioConfig := meta.ModelRatioConfig
+	for _, config := range modelRatioConfig {
+		if config.ModelName == textRequest.Model {
+			groupRatio = config.GroupRatio[meta.Group] // 如果模型配置了分组倍率，则使用分组倍率
+			break
+		}
+	}
 	ratio := modelRatio * groupRatio
 	// pre-consume quota
 	promptTokens := getPromptTokens(textRequest, meta.Mode)

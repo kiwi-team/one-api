@@ -809,7 +809,7 @@ func GetCompletionRatio(name string, channelType int) float64 {
 	if strings.HasPrefix(name, "gpt-4.1") {
 		return 4
 	}
-	if name == "o3" || name == "o4-mini" {
+	if name == "o3" || name == "o4-mini" || name == "o4-mini-2025-04-16" {
 		return 4
 	}
 

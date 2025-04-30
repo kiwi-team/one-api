@@ -36,6 +36,7 @@ type Meta struct {
 	ForcedSystemPrompt string
 	StartTime          time.Time
 	IP                 string
+	ModelRatioConfig   []model.ModelRatioConfig
 }
 
 func GetByContext(c *gin.Context) *Meta {
@@ -62,6 +63,10 @@ func GetByContext(c *gin.Context) *Meta {
 	}
 	if meta.BaseURL == "" {
 		meta.BaseURL = channeltype.ChannelBaseURLs[meta.ChannelType]
+	}
+	modelRatioConfig, ok := c.Get(ctxkey.ModelRatioConfig)
+	if ok {
+		meta.ModelRatioConfig = modelRatioConfig.([]model.ModelRatioConfig) // 断言类型
 	}
 	meta.APIType = channeltype.ToAPIType(meta.ChannelType)
 	return &meta

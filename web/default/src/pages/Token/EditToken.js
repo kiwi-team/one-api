@@ -3,10 +3,9 @@ import { useTranslation } from 'react-i18next';
 import {
   Button,
   Form,
-  Header,
   Message,
-  Segment,
   Card,
+  TextArea,
 } from 'semantic-ui-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
@@ -17,6 +16,18 @@ import {
   timestamp2string,
 } from '../../helpers';
 import { renderQuotaWithPrompt } from '../../helpers/render';
+
+const MODEL_RATIO_CONFIG_EXAMPLE = [{
+    "model_name": "gpt-3.5-turbo",
+    "group_ratio": {
+      "default": 1.5,
+      "vip": 1,
+      "svip": 1,
+    },
+  }
+];
+
+
 
 const EditToken = () => {
   const { t } = useTranslation();
@@ -33,9 +44,10 @@ const EditToken = () => {
     models: [],
     subnet: "",
     channel_ids:"",
+    model_ratio_config: [],
   };
   const [inputs, setInputs] = useState(originInputs);
-  const { name, remain_quota, expired_time, unlimited_quota,channel_ids } = inputs;
+  const { name, remain_quota, expired_time, unlimited_quota,channel_ids,model_ratio_config } = inputs;
   const navigate = useNavigate();
   const handleInputChange = (e, { name, value }) => {
     setInputs((inputs) => ({ ...inputs, [name]: value }));
@@ -199,7 +211,21 @@ const EditToken = () => {
                 onChange={handleInputChange}
                 type='string'
                 />
-          </Form.Field>
+            </Form.Field>
+            <Form.Field>
+                模型倍率配置
+            <TextArea
+                        placeholder={`此项可选，用于修改当前key下模型的倍率:\n${JSON.stringify(MODEL_RATIO_CONFIG_EXAMPLE, null, 2)}`}
+                        name='model_ratio_config'
+                        onChange={value => {
+                            handleInputChange('model_ratio_config', value)
+                        }}
+                        autosize
+                        rows={15}
+                        value={inputs.model_ratio_config}
+                        autoComplete='new-password'
+                        />
+            </Form.Field>
             <Form.Field>
               <Form.Input
                 label={t('token.edit.ip_limit')}

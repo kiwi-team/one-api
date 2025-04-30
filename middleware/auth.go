@@ -123,6 +123,12 @@ func TokenAuth() func(c *gin.Context) {
 			abortWithMessage(c, http.StatusBadRequest, err.Error())
 			return
 		}
+		tokenModelRatioConfig, err := token.LoadModelRatioConfig()
+		if err != nil {
+			abortWithMessage(c, http.StatusInternalServerError, err.Error())
+			return
+		}
+		c.Set(ctxkey.ModelRatioConfig, tokenModelRatioConfig)
 		c.Set(ctxkey.RequestModel, requestModel)
 		if token.Models != nil && *token.Models != "" {
 			c.Set(ctxkey.AvailableModels, *token.Models)

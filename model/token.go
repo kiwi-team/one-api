@@ -1,6 +1,7 @@
 package model
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -21,20 +22,31 @@ const (
 )
 
 type Token struct {
-	Id             int     `json:"id"`
-	UserId         int     `json:"user_id"`
-	Key            string  `json:"key" gorm:"type:char(48);uniqueIndex"`
-	Status         int     `json:"status" gorm:"default:1"`
-	Name           string  `json:"name" gorm:"index" `
-	CreatedTime    int64   `json:"created_time" gorm:"bigint"`
-	AccessedTime   int64   `json:"accessed_time" gorm:"bigint"`
-	ExpiredTime    int64   `json:"expired_time" gorm:"bigint;default:-1"` // -1 means never expired
-	RemainQuota    int64   `json:"remain_quota" gorm:"bigint;default:0"`
-	UnlimitedQuota bool    `json:"unlimited_quota" gorm:"default:false"`
-	UsedQuota      int64   `json:"used_quota" gorm:"bigint;default:0"` // used quota
-	Models         *string `json:"models" gorm:"type:text"`            // allowed models
-	Subnet         *string `json:"subnet" gorm:"default:''"`           // allowed subnet
-	ChannelIds     *string `json:"channel_ids" gorm:"type:text"`       // channel ids
+	Id               int               `json:"id"`
+	UserId           int               `json:"user_id"`
+	Key              string            `json:"key" gorm:"type:char(48);uniqueIndex"`
+	Status           int               `json:"status" gorm:"default:1"`
+	Name             string            `json:"name" gorm:"index" `
+	CreatedTime      int64             `json:"created_time" gorm:"bigint"`
+	AccessedTime     int64             `json:"accessed_time" gorm:"bigint"`
+	ExpiredTime      int64             `json:"expired_time" gorm:"bigint;default:-1"` // -1 means never expired
+	RemainQuota      int64             `json:"remain_quota" gorm:"bigint;default:0"`
+	UnlimitedQuota   bool              `json:"unlimited_quota" gorm:"default:false"`
+	UsedQuota        int64             `json:"used_quota" gorm:"bigint;default:0"`  // used quota
+	Models           *string           `json:"models" gorm:"type:text"`             // allowed models
+	Subnet           *string           `json:"subnet" gorm:"default:''"`            // allowed subnet
+	ChannelIds       *string           `json:"channel_ids" gorm:"type:text"`        // channel ids
+	ModelChannelMap  map[string]string `json:"model_channel_map" gorm:"type:json"`  // model channel map,可以指定模型使用哪几个渠道
+	ModelRatioConfig string            `json:"model_ratio_config" gorm:"type:text"` // model ratio config,可以配置这个token下，某些模型的倍率(输入/输出/分组倍率等)
+
+}
+
+// ModelRatioConfig 模型倍率配置,配置某个key下，某些模型的倍率(输入/输出/分组倍率等)
+type ModelRatioConfig struct {
+	ModelName       string             `json:"model_name,omitempty"`
+	PromptRatio     float64            `json:"prompt_ratio,omitempty"`
+	CompletionRatio float64            `json:"completion_ratio,omitempty"`
+	GroupRatio      map[string]float64 `json:"group_ratio,omitempty"`
 }
 
 func GetAllUserTokens(userId int, startIdx int, num int, order string) ([]*Token, error) {
@@ -151,6 +163,18 @@ func GetTokenById(id int) (*Token, error) {
 func (t *Token) Insert() error {
 	err := DB.Create(t).Error
 	return err
+}
+
+func (t *Token) LoadModelRatioConfig() ([]ModelRatioConfig, error) {
+	var cfg []ModelRatioConfig
+	if t.ModelRatioConfig == "" || t.ModelRatioConfig == "null" {
+		return cfg, nil
+	}
+	err := json.Unmarshal([]byte(t.ModelRatioConfig), &cfg)
+	if err != nil {
+		return cfg, err
+	}
+	return cfg, nil
 }
 
 // Update Make sure your token's fields is completed, because this will update non-zero values
