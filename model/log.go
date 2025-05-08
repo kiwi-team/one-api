@@ -22,6 +22,7 @@ type Log struct {
 	Username          string `json:"username" gorm:"index:index_username_model_name,priority:2;default:''"`
 	TokenName         string `json:"token_name" gorm:"index;default:''"`
 	ModelName         string `json:"model_name" gorm:"index;index:index_username_model_name,priority:1;default:''"`
+	TokenId           int    `json:"token_id" gorm:"index"`
 	Quota             int    `json:"quota" gorm:"default:0"`
 	PromptTokens      int    `json:"prompt_tokens" gorm:"default:0"`
 	CompletionTokens  int    `json:"completion_tokens" gorm:"default:0"`
@@ -95,7 +96,18 @@ func RecordConsumeLog(ctx context.Context, userId int, channelId int, promptToke
 	username := GetUsernameById(userId)
 	if config.DataExportEnabled {
 		gopool.Go(func() {
-			LogQuotaData(userId, username, modelName, int(quota), helper.GetTimestamp(), promptTokens+completionTokens, tokenName)
+			//LogQuotaData(userId, username, modelName, int(quota), helper.GetTimestamp(), promptTokens+completionTokens, tokenName)
+			LogQuotaData(&LogQuotaDataCache{
+				UserId:           userId,
+				Username:         username,
+				ModelName:        modelName,
+				Quota:            int(quota),
+				CreatedAt:        helper.GetTimestamp(),
+				TokenUsed:        promptTokens + completionTokens,
+				TokenName:        tokenName,
+				PromptTokens:     promptTokens,
+				CompletionTokens: completionTokens,
+			})
 		})
 	}
 	requestId := helper.GetRequestID(ctx)
@@ -138,7 +150,19 @@ func RecordOneConsumeLog(ctx context.Context, log *Log) {
 	log.Type = LogTypeConsume
 	if config.DataExportEnabled {
 		gopool.Go(func() {
-			LogQuotaData(log.UserId, log.Username, log.ModelName, log.Quota, log.CreatedAt, log.PromptTokens+log.CompletionTokens, log.TokenName)
+			//LogQuotaData(log.UserId, log.Username, log.ModelName, log.Quota, log.CreatedAt, log.PromptTokens+log.CompletionTokens, log.TokenName)
+			LogQuotaData(&LogQuotaDataCache{
+				UserId:           log.UserId,
+				Username:         log.Username,
+				ModelName:        log.ModelName,
+				Quota:            log.Quota,
+				CreatedAt:        log.CreatedAt,
+				TokenUsed:        log.PromptTokens + log.CompletionTokens,
+				TokenName:        log.TokenName,
+				PromptTokens:     log.PromptTokens,
+				CompletionTokens: log.CompletionTokens,
+				TokenId:          log.TokenId,
+			})
 		})
 	}
 	recordLogHelper(ctx, log)

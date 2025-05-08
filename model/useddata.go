@@ -11,15 +11,31 @@ import (
 
 // QuotaData 柱状图数据
 type QuotaData struct {
-	Id        int    `json:"id"`
-	UserID    int    `json:"user_id" gorm:"index"`
-	Username  string `json:"username" gorm:"index:idx_qdt_model_user_name,priority:2;size:64;default:''"`
-	ModelName string `json:"model_name" gorm:"index:idx_qdt_model_user_name,priority:1;size:64;default:''"`
-	CreatedAt int64  `json:"created_at" gorm:"bigint;index:idx_qdt_created_at,priority:2"`
-	TokenUsed int    `json:"token_used" gorm:"default:0"`
-	TokenName string `json:"token_name" gorm:"size:64;default:''"`
-	Count     int    `json:"count" gorm:"default:0"`
-	Quota     int    `json:"quota" gorm:"default:0"`
+	Id               int    `json:"id"`
+	UserID           int    `json:"user_id" gorm:"index"`
+	Username         string `json:"username" gorm:"index:idx_qdt_model_user_name,priority:2;size:64;default:''"`
+	ModelName        string `json:"model_name" gorm:"index:idx_qdt_model_user_name,priority:1;size:64;default:''"`
+	CreatedAt        int64  `json:"created_at" gorm:"bigint;index:idx_qdt_created_at,priority:2"`
+	TokenUsed        int    `json:"token_used" gorm:"default:0"`
+	PromptTokens     int    `json:"prompt_tokens" gorm:"default:0"`
+	CompletionTokens int    `json:"completion_tokens" gorm:"default:0"`
+	TokenName        string `json:"token_name" gorm:"size:64;default:''"`
+	Count            int    `json:"count" gorm:"default:0"`
+	Quota            int    `json:"quota" gorm:"default:0"`
+	TokenId          int    `json:"token_id" gorm:"index"`
+}
+
+type LogQuotaDataCache struct {
+	UserId           int
+	Username         string
+	ModelName        string
+	CreatedAt        int64
+	TokenUsed        int
+	PromptTokens     int
+	CompletionTokens int
+	Quota            int
+	TokenName        string
+	TokenId          int
 }
 
 func UpdateQuotaData() {
@@ -41,35 +57,51 @@ func UpdateQuotaData() {
 var CacheQuotaData = make(map[string]*QuotaData)
 var CacheQuotaDataLock = sync.Mutex{}
 
-func logQuotaDataCache(userId int, username string, modelName string, quota int, createdAt int64, tokenUsed int, tokenName string) {
-	key := fmt.Sprintf("%d-%s-%s-%s-%d", userId, username, modelName, tokenName, createdAt)
+func logQuotaDataCache(userId int, username string, modelName string, quota int, createdAt int64, tokenUsed int, tokenName string, promptTokens int, completionTokens int, tokenId int) {
+	key := fmt.Sprintf("%d-%s-%s-%d-%d", userId, username, modelName, tokenId, createdAt)
 	quotaData, ok := CacheQuotaData[key]
 	if ok {
 		quotaData.Count += 1
 		quotaData.Quota += quota
 		quotaData.TokenUsed += tokenUsed
+		quotaData.PromptTokens += promptTokens
+		quotaData.CompletionTokens += completionTokens
 	} else {
 		quotaData = &QuotaData{
-			UserID:    userId,
-			Username:  username,
-			ModelName: modelName,
-			CreatedAt: createdAt,
-			Count:     1,
-			Quota:     quota,
-			TokenUsed: tokenUsed,
-			TokenName: tokenName,
+			UserID:           userId,
+			Username:         username,
+			ModelName:        modelName,
+			CreatedAt:        createdAt,
+			Count:            1,
+			Quota:            quota,
+			TokenUsed:        tokenUsed,
+			TokenName:        tokenName,
+			PromptTokens:     promptTokens,
+			CompletionTokens: completionTokens,
+			TokenId:          tokenId,
 		}
 	}
 	CacheQuotaData[key] = quotaData
 }
 
-func LogQuotaData(userId int, username string, modelName string, quota int, createdAt int64, tokenUsed int, tokenName string) {
+// func LogQuotaData(userId int, username string, modelName string, quota int, createdAt int64, tokenUsed int, tokenName string) {
+func LogQuotaData(logQuotaData *LogQuotaDataCache) {
+	userId := logQuotaData.UserId
+	username := logQuotaData.Username
+	modelName := logQuotaData.ModelName
+	createdAt := logQuotaData.CreatedAt
+	tokenUsed := logQuotaData.TokenUsed
+	tokenName := logQuotaData.TokenName
+	promptTokens := logQuotaData.PromptTokens
+	completionTokens := logQuotaData.CompletionTokens
+	quota := logQuotaData.Quota
+	tokenId := logQuotaData.TokenId
 	// 只精确到小时
 	createdAt = createdAt - (createdAt % 3600)
 
 	CacheQuotaDataLock.Lock()
 	defer CacheQuotaDataLock.Unlock()
-	logQuotaDataCache(userId, username, modelName, quota, createdAt, tokenUsed, tokenName)
+	logQuotaDataCache(userId, username, modelName, quota, createdAt, tokenUsed, tokenName, promptTokens, completionTokens, tokenId)
 }
 
 func SaveQuotaDataCache() {
@@ -82,13 +114,13 @@ func SaveQuotaDataCache() {
 	// 3. 如果没有数据，就插入数据
 	for _, quotaData := range CacheQuotaData {
 		quotaDataDB := &QuotaData{}
-		DB.Table("quota_data").Where("user_id = ? and username = ? and model_name = ? and created_at = ? and token_name = ?",
-			quotaData.UserID, quotaData.Username, quotaData.ModelName, quotaData.CreatedAt, quotaData.TokenName).First(quotaDataDB)
+		DB.Table("quota_data").Where("user_id = ? and username = ? and model_name = ? and created_at = ? and token_id = ?",
+			quotaData.UserID, quotaData.Username, quotaData.ModelName, quotaData.CreatedAt, quotaData.TokenId).First(quotaDataDB)
 		if quotaDataDB.Id > 0 {
 			//quotaDataDB.Count += quotaData.Count
 			//quotaDataDB.Quota += quotaData.Quota
 			//DB.Table("quota_data").Save(quotaDataDB)
-			increaseQuotaData(quotaData.UserID, quotaData.Username, quotaData.ModelName, quotaData.Count, quotaData.Quota, quotaData.CreatedAt, quotaData.TokenUsed, quotaData.TokenName)
+			increaseQuotaData(quotaData.UserID, quotaData.Username, quotaData.ModelName, quotaData.Count, quotaData.Quota, quotaData.CreatedAt, quotaData.TokenUsed, quotaData.TokenId, quotaData.PromptTokens, quotaData.CompletionTokens)
 		} else {
 			DB.Table("quota_data").Create(quotaData)
 		}
@@ -97,12 +129,14 @@ func SaveQuotaDataCache() {
 	fmt.Printf("保存数据看板数据成功，共保存%d条数据\n", size)
 }
 
-func increaseQuotaData(userId int, username string, modelName string, count int, quota int, createdAt int64, tokenUsed int, tokenName string) {
-	err := DB.Table("quota_data").Where("user_id = ? and username = ? and model_name = ? and created_at = ? and token_name = ?",
-		userId, username, modelName, createdAt, tokenName).Updates(map[string]interface{}{
-		"count":      gorm.Expr("count + ?", count),
-		"quota":      gorm.Expr("quota + ?", quota),
-		"token_used": gorm.Expr("token_used + ?", tokenUsed),
+func increaseQuotaData(userId int, username string, modelName string, count int, quota int, createdAt int64, tokenUsed int, tokenId int, promptTokens int, completionTokens int) {
+	err := DB.Table("quota_data").Where("user_id = ? and username = ? and model_name = ? and created_at = ? and token_id = ?",
+		userId, username, modelName, createdAt, tokenId).Updates(map[string]interface{}{
+		"count":             gorm.Expr("count + ?", count),
+		"quota":             gorm.Expr("quota + ?", quota),
+		"token_used":        gorm.Expr("token_used + ?", tokenUsed),
+		"prompt_tokens":     gorm.Expr("prompt_tokens + ?", promptTokens),
+		"completion_tokens": gorm.Expr("completion_tokens + ?", completionTokens),
 	}).Error
 	if err != nil {
 		fmt.Printf("increaseQuotaData error: %s\n", err)

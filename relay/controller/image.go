@@ -297,6 +297,7 @@ func RelayImageHelper(c *gin.Context, relayMode int) *relaymodel.ErrorWithStatus
 				CompletionTokens:  completionTokens,
 				ModelName:         imageRequest.Model,
 				TokenName:         meta.TokenName,
+				TokenId:           meta.TokenId,
 				Quota:             int(quota),
 				Content:           logContent,
 				Milliseconds:      milliseconds,
