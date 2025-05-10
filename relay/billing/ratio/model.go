@@ -718,6 +718,8 @@ func ModelRatio2JSONString() string {
 func UpdateModelRatioByJSONString(jsonStr string) error {
 	modelRatioLock.Lock()
 	defer modelRatioLock.Unlock()
+	// First add any missing ratios
+	jsonStr = AddNewMissingRatio(jsonStr)
 	ModelRatio = make(map[string]float64)
 	return json.Unmarshal([]byte(jsonStr), &ModelRatio)
 }

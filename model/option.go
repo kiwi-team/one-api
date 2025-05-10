@@ -75,6 +75,9 @@ func InitOptionMap() {
 	config.OptionMap["QuotaPerUnit"] = strconv.FormatFloat(config.QuotaPerUnit, 'f', -1, 64)
 	config.OptionMap["RetryTimes"] = strconv.Itoa(config.RetryTimes)
 	config.OptionMap["Theme"] = config.Theme
+	config.OptionMap["ModelRatioDb"] = "{}"
+	config.OptionMap["OriginRatio"] = "{}"
+	config.OptionMap["SupplerRatio"] = "{}"
 	config.OptionMapRWMutex.Unlock()
 	loadOptionsFromDatabase()
 }
@@ -83,6 +86,7 @@ func loadOptionsFromDatabase() {
 	options, _ := AllOption()
 	for _, option := range options {
 		if option.Key == "ModelRatio" {
+			config.OptionMap["ModelRatioDb"] = option.Value
 			option.Value = billingratio.AddNewMissingRatio(option.Value)
 		}
 		err := updateOptionMap(option.Key, option.Value)
