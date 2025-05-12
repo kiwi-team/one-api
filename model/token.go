@@ -344,6 +344,12 @@ func PostConsumeTokenQuota(tokenId int, quota int64) (err error) {
 		if err != nil {
 			return err
 		}
+	} else {
+		// 更新accessed_time
+		err = DB.Model(&Token{}).Where("id = ?", tokenId).Update("accessed_time", helper.GetTimestamp()).Error
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
