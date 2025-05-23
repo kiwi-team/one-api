@@ -7,7 +7,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"mime/multipart"
 	"net/http"
+	"net/textproto"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -28,24 +32,57 @@ import (
 	"github.com/songquanpeng/one-api/relay/channeltype"
 	"github.com/songquanpeng/one-api/relay/meta"
 	relaymodel "github.com/songquanpeng/one-api/relay/model"
+	"github.com/songquanpeng/one-api/relay/relaymode"
 )
 
-func getImageRequest(c *gin.Context, _ int) (*relaymodel.ImageRequest, error) {
+func getImageRequest(c *gin.Context, mode int) (*relaymodel.ImageRequest, error) {
 	imageRequest := &relaymodel.ImageRequest{}
-	err := common.UnmarshalBodyReusable(c, imageRequest)
-	if err != nil {
-		return nil, err
+	switch mode {
+	case relaymode.Edits:
+		_, err := c.MultipartForm()
+		if err != nil {
+			return nil, err
+		}
+		formData := c.Request.PostForm
+		imageRequest.Prompt = formData.Get("prompt")
+		imageRequest.Model = formData.Get("model")
+		imageRequest.N = helper.String2Int(formData.Get("n"))
+		imageRequest.Quality = formData.Get("quality")
+		imageRequest.Size = formData.Get("size")
+
+		if imageRequest.Model == "gpt-image-1" {
+			if imageRequest.Quality == "" {
+				imageRequest.Quality = "standard"
+			}
+		}
+	default:
+		err := common.UnmarshalBodyReusable(c, imageRequest)
+		if err != nil {
+			return nil, err
+		}
+		// Not "256x256", "512x512", or "1024x1024"
+		if imageRequest.Model == "dall-e-2" || imageRequest.Model == "dall-e" {
+			if imageRequest.Size != "" && imageRequest.Size != "256x256" && imageRequest.Size != "512x512" && imageRequest.Size != "1024x1024" {
+				return nil, errors.New("size must be one of 256x256, 512x512, or 1024x1024 for dall-e-2 or dall-e")
+			}
+		} else if imageRequest.Model == "dall-e-3" {
+			if imageRequest.Size != "" && imageRequest.Size != "1024x1024" && imageRequest.Size != "1024x1792" && imageRequest.Size != "1792x1024" {
+				return nil, errors.New("size must be one of 1024x1024, 1024x1792 or 1792x1024 for dall-e-3")
+			}
+			if imageRequest.Quality == "" {
+				imageRequest.Quality = "standard"
+			}
+			// N should between 1 and 10
+			//if imageRequest.N != 0 && (imageRequest.N < 1 || imageRequest.N > 10) {
+			//	return service.OpenAIErrorWrapper(errors.New("n must be between 1 and 10"), "invalid_field_value", http.StatusBadRequest)
+			//}
+		}
 	}
-	if imageRequest.N == 0 {
+	if imageRequest.N <= 0 {
 		imageRequest.N = 1
 	}
-	if imageRequest.Size == "" {
-		imageRequest.Size = "1024x1024"
-	}
-	if imageRequest.Model == "" {
-		imageRequest.Model = "dall-e-2"
-	}
 	return imageRequest, nil
+
 }
 
 func isValidImageSize(model string, size string) bool {
@@ -73,24 +110,28 @@ func getImageSizeRatio(model string, size string) float64 {
 	return 1
 }
 
-func validateImageRequest(imageRequest *relaymodel.ImageRequest, _ *meta.Meta) *relaymodel.ErrorWithStatusCode {
+// 验证文生图/图生图的请求
+func validateImageRequest(imageRequest *relaymodel.ImageRequest, meta *meta.Meta) *relaymodel.ErrorWithStatusCode {
 	// check prompt length
 	if imageRequest.Prompt == "" {
 		return openai.ErrorWrapper(errors.New("prompt is required"), "prompt_missing", http.StatusBadRequest)
 	}
+	if meta.Mode == relaymode.Edits {
+		return nil
+	} else if meta.Mode == relaymode.ImagesGenerations {
+		// model validation
+		if !isValidImageSize(imageRequest.Model, imageRequest.Size) {
+			return openai.ErrorWrapper(errors.New("size not supported for this image model"), "size_not_supported", http.StatusBadRequest)
+		}
 
-	// model validation
-	if !isValidImageSize(imageRequest.Model, imageRequest.Size) {
-		return openai.ErrorWrapper(errors.New("size not supported for this image model"), "size_not_supported", http.StatusBadRequest)
-	}
+		if !isValidImagePromptLength(imageRequest.Model, len(imageRequest.Prompt)) {
+			return openai.ErrorWrapper(errors.New("prompt is too long"), "prompt_too_long", http.StatusBadRequest)
+		}
 
-	if !isValidImagePromptLength(imageRequest.Model, len(imageRequest.Prompt)) {
-		return openai.ErrorWrapper(errors.New("prompt is too long"), "prompt_too_long", http.StatusBadRequest)
-	}
-
-	// Number of generated images validation
-	if !isWithinRange(imageRequest.Model, imageRequest.N) {
-		return openai.ErrorWrapper(errors.New("invalid value of n"), "n_not_within_range", http.StatusBadRequest)
+		// Number of generated images validation
+		if !isWithinRange(imageRequest.Model, imageRequest.N) {
+			return openai.ErrorWrapper(errors.New("invalid value of n"), "n_not_within_range", http.StatusBadRequest)
+		}
 	}
 	return nil
 }
@@ -113,7 +154,7 @@ func getImageCostRatio(imageRequest *relaymodel.ImageRequest) (float64, error) {
 func RelayImageHelper(c *gin.Context, relayMode int) *relaymodel.ErrorWithStatusCode {
 	ctx := c.Request.Context()
 	meta := meta.GetByContext(c)
-	imageRequest, err := getImageRequest(c, meta.Mode)
+	imageRequest, err := getImageRequest(c, relayMode)
 	if err != nil {
 		logger.Errorf(ctx, "getImageRequest failed: %s", err.Error())
 		return openai.ErrorWrapper(err, "invalid_image_request", http.StatusBadRequest)
@@ -143,8 +184,8 @@ func RelayImageHelper(c *gin.Context, relayMode int) *relaymodel.ErrorWithStatus
 
 	var requestBody io.Reader
 	if isModelMapped || meta.ChannelType == channeltype.Azure { // make Azure channel request body
-		jsonStr, err := json.Marshal(imageRequest)
-		if err != nil {
+		jsonStr, err1 := json.Marshal(imageRequest)
+		if err1 != nil {
 			return openai.ErrorWrapper(err, "marshal_image_request_failed", http.StatusInternalServerError)
 		}
 		requestBody = bytes.NewBuffer(jsonStr)
@@ -178,6 +219,13 @@ func RelayImageHelper(c *gin.Context, relayMode int) *relaymodel.ErrorWithStatus
 		}
 		requestBody = bytes.NewBuffer(jsonStr)
 	}
+	if relayMode == relaymode.Edits {
+		convertedRequest, err1 := convertFormImageRequest(c, imageRequest)
+		if err1 != nil {
+			return openai.ErrorWrapper(err, "convert_form_image_request_failed", http.StatusInternalServerError)
+		}
+		requestBody = convertedRequest.(io.Reader)
+	}
 
 	modelRatio := billingratio.GetModelRatio(imageModel, meta.ChannelType)
 	groupRatio := billingratio.GetGroupRatio(meta.Group)
@@ -190,8 +238,13 @@ func RelayImageHelper(c *gin.Context, relayMode int) *relaymodel.ErrorWithStatus
 		// replicate always return 1 image
 		quota = int64(ratio * imageCostRatio * 1000)
 	default:
-		quota = int64(ratio*imageCostRatio*1000) * int64(imageRequest.N)
+		if imageRequest.Model == "gpt-image-1" {
+			quota = int64(ratio * imageCostRatio * 1000)
+		} else {
+			quota = int64(ratio*imageCostRatio*1000) * int64(imageRequest.N)
+		}
 	}
+	fmt.Println("quota", quota, "modelRatio", modelRatio, "groupRatio", groupRatio, "userQuota", userQuota, "quota", quota)
 
 	if userQuota-quota < 0 {
 		return openai.ErrorWrapper(errors.New("user quota is not enough"), "insufficient_user_quota", http.StatusForbidden)
@@ -325,4 +378,140 @@ func RelayImageHelper(c *gin.Context, relayMode int) *relaymodel.ErrorWithStatus
 	}
 
 	return nil
+}
+
+func convertFormImageRequest(c *gin.Context, request *relaymodel.ImageRequest) (any, error) {
+	var requestBody bytes.Buffer
+	writer := multipart.NewWriter(&requestBody)
+
+	writer.WriteField("model", request.Model)
+	// 获取所有表单字段
+	formData := c.Request.PostForm
+	// 遍历表单字段并打印输出
+	for key, values := range formData {
+		if key == "model" {
+			continue
+		}
+		for _, value := range values {
+			writer.WriteField(key, value)
+		}
+	}
+
+	// Parse the multipart form to handle both single image and multiple images
+	if err := c.Request.ParseMultipartForm(32 << 20); err != nil { // 32MB max memory
+		return nil, errors.New("failed to parse multipart form")
+	}
+
+	if c.Request.MultipartForm != nil && c.Request.MultipartForm.File != nil {
+		// Check if "image" field exists in any form, including array notation
+		var imageFiles []*multipart.FileHeader
+		var exists bool
+
+		// First check for standard "image" field
+		if imageFiles, exists = c.Request.MultipartForm.File["image"]; !exists || len(imageFiles) == 0 {
+			// If not found, check for "image[]" field
+			if imageFiles, exists = c.Request.MultipartForm.File["image[]"]; !exists || len(imageFiles) == 0 {
+				// If still not found, iterate through all fields to find any that start with "image["
+				foundArrayImages := false
+				for fieldName, files := range c.Request.MultipartForm.File {
+					if strings.HasPrefix(fieldName, "image[") && len(files) > 0 {
+						foundArrayImages = true
+						for _, file := range files {
+							imageFiles = append(imageFiles, file)
+						}
+					}
+				}
+
+				// If no image fields found at all
+				if !foundArrayImages && (len(imageFiles) == 0) {
+					return nil, errors.New("image is required")
+				}
+			}
+		}
+
+		// Process all image files
+		for i, fileHeader := range imageFiles {
+			file, err := fileHeader.Open()
+			if err != nil {
+				return nil, fmt.Errorf("failed to open image file %d: %w", i, err)
+			}
+			defer file.Close()
+
+			// If multiple images, use image[] as the field name
+			fieldName := "image"
+			if len(imageFiles) > 1 {
+				fieldName = "image[]"
+			}
+
+			// Determine MIME type based on file extension
+			mimeType := detectImageMimeType(fileHeader.Filename)
+
+			// Create a form file with the appropriate content type
+			h := make(textproto.MIMEHeader)
+			h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"; filename="%s"`, fieldName, fileHeader.Filename))
+			h.Set("Content-Type", mimeType)
+
+			part, err := writer.CreatePart(h)
+			if err != nil {
+				return nil, fmt.Errorf("create form part failed for image %d: %w", i, err)
+			}
+
+			if _, err := io.Copy(part, file); err != nil {
+				return nil, fmt.Errorf("copy file failed for image %d: %w", i, err)
+			}
+		}
+
+		// Handle mask file if present
+		if maskFiles, exists := c.Request.MultipartForm.File["mask"]; exists && len(maskFiles) > 0 {
+			maskFile, err := maskFiles[0].Open()
+			if err != nil {
+				return nil, errors.New("failed to open mask file")
+			}
+			defer maskFile.Close()
+
+			// Determine MIME type for mask file
+			mimeType := detectImageMimeType(maskFiles[0].Filename)
+
+			// Create a form file with the appropriate content type
+			h := make(textproto.MIMEHeader)
+			h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="mask"; filename="%s"`, maskFiles[0].Filename))
+			h.Set("Content-Type", mimeType)
+
+			maskPart, err := writer.CreatePart(h)
+			if err != nil {
+				return nil, errors.New("create form file failed for mask")
+			}
+
+			if _, err := io.Copy(maskPart, maskFile); err != nil {
+				return nil, errors.New("copy mask file failed")
+			}
+		}
+	} else {
+		return nil, errors.New("no multipart form data found")
+	}
+
+	// 关闭 multipart 编写器以设置分界线
+	writer.Close()
+	c.Request.Header.Set("Content-Type", writer.FormDataContentType())
+	return bytes.NewReader(requestBody.Bytes()), nil
+}
+
+// detectImageMimeType determines the MIME type based on the file extension
+func detectImageMimeType(filename string) string {
+	ext := strings.ToLower(filepath.Ext(filename))
+	switch ext {
+	case ".jpg", ".jpeg":
+		return "image/jpeg"
+	case ".png":
+		return "image/png"
+	case ".webp":
+		return "image/webp"
+	default:
+		// Try to detect from extension if possible
+		if strings.HasPrefix(ext, ".jp") {
+			return "image/jpeg"
+		}
+		// Default to png as a fallback
+		return "image/png"
+	}
 }

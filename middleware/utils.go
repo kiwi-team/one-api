@@ -8,6 +8,7 @@ import (
 	"github.com/songquanpeng/one-api/common"
 	"github.com/songquanpeng/one-api/common/helper"
 	"github.com/songquanpeng/one-api/common/logger"
+	"github.com/songquanpeng/one-api/common/utils"
 )
 
 func abortWithMessage(c *gin.Context, statusCode int, message string) {
@@ -41,6 +42,9 @@ func getRequestModel(c *gin.Context) (string, error) {
 		if modelRequest.Model == "" {
 			modelRequest.Model = "dall-e-2"
 		}
+	}
+	if strings.HasPrefix(c.Request.URL.Path, "/v1/images/edits") {
+		modelRequest.Model = utils.GetStringIfEmpty(c.PostForm("model"), "gpt-image-1")
 	}
 	if strings.HasPrefix(c.Request.URL.Path, "/v1/audio/transcriptions") || strings.HasPrefix(c.Request.URL.Path, "/v1/audio/translations") {
 		if modelRequest.Model == "" {

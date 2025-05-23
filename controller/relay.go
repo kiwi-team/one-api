@@ -26,7 +26,7 @@ import (
 func relayHelper(c *gin.Context, relayMode int) *model.ErrorWithStatusCode {
 	var err *model.ErrorWithStatusCode
 	switch relayMode {
-	case relaymode.ImagesGenerations:
+	case relaymode.ImagesGenerations, relaymode.Edits:
 		err = controller.RelayImageHelper(c, relayMode)
 	case relaymode.AudioSpeech:
 		fallthrough
@@ -54,8 +54,13 @@ func Relay(c *gin.Context) {
 	channelIds := c.GetString(ctxkey.ChannelIds)
 	relayMode := relaymode.GetByPath(c.Request.URL.Path)
 	if config.DebugEnabled {
-		requestBody, _ := common.GetRequestBody(c)
-		logger.Debugf(ctx, "request body: %s", string(requestBody))
+		if c.PostForm("model") != "" {
+			modelName = c.PostForm("model")
+			logger.Debugf(ctx, "request form: model:%s, prompt:%s", c.PostForm("model"), c.PostForm("prompt"))
+		} else {
+			requestBody, _ := common.GetRequestBody(c)
+			logger.Debugf(ctx, "request body: %s", string(requestBody))
+		}
 	}
 	channelId := c.GetInt(ctxkey.ChannelId)
 	userId := c.GetInt(ctxkey.Id)
@@ -68,8 +73,13 @@ func Relay(c *gin.Context) {
 	channelName := c.GetString(ctxkey.ChannelName)
 	group := c.GetString(ctxkey.Group)
 	originalModel := c.GetString(ctxkey.OriginalModel)
-	body, _ := common.GetRequestBody(c)
-	go dbmodel.SaveErrorLog(userId, channelId, channelName, modelName, bizErr, string(body))
+	if c.PostForm("model") != "" {
+		body := fmt.Sprintf("model: %s prompt: %s", c.PostForm("model"), c.PostForm("prompt"))
+		go dbmodel.SaveErrorLog(userId, channelId, channelName, modelName, bizErr, body)
+	} else {
+		body, _ := common.GetRequestBody(c)
+		go dbmodel.SaveErrorLog(userId, channelId, channelName, modelName, bizErr, string(body))
+	}
 	go processChannelRelayError(ctx, userId, channelId, channelName, bizErr, modelName, modelId)
 	requestId := c.GetString(helper.RequestIdKey)
 	retryTimes := config.RetryTimes
