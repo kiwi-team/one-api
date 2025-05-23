@@ -3,6 +3,8 @@ package panda
 // https://api.panda-v.com/pricing
 
 var ModelList = []string{
+	"claude-opus-4-20250514",
+	"claude-sonnet-4-20250514",
 	"o1",
 	"gemini-2.5-flash-preview-04-17",
 	"gpt-4.5-preview",

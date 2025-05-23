@@ -1,6 +1,8 @@
 package aiguoguo
 
 var ModelList = []string{
+	"claude-opus-4-20250514",
+	"claude-sonnet-4-20250514",
 	"gemini-2.5-pro-exp-03-25",
 	"gemini-2.0-flash-exp-image-generation",
 	"gemini-1.5-flash",

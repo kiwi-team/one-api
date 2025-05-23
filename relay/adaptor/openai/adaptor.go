@@ -105,8 +105,17 @@ func (a *Adaptor) ConvertRequest(c *gin.Context, relayMode int, request *model.G
 		request.Model = strings.ToLower(request.Model)
 	}
 	// 走panda渠道的时候,如果请求是 claude-3-7-sonnet-20250219 并且开启了 thinking，则把模型名改为 claude-3-7-sonnet-20250219#thinking
-	if a.ChannelType == channeltype.Panda && strings.HasPrefix(request.Model, "claude-3-7-sonnet-20250219") && request.Thinking != nil && request.Thinking.Type == "enabled" {
-		request.Model = request.Model + "#thinking"
+	if a.ChannelType == channeltype.Panda && strings.HasPrefix(request.Model, "claude-") && request.Thinking != nil && request.Thinking.Type == "enabled" {
+		//request.Model = request.Model + "#thinking"
+		if request.Thinking.BudgetTokens > 0 {
+			request.Reasoning = &model.Reasoning{
+				MaxTokens: &request.Thinking.BudgetTokens,
+			}
+		} else {
+			request.Reasoning = &model.Reasoning{
+				Effort: "medium",
+			}
+		}
 		if request.Thinking.BudgetTokens > request.MaxTokens {
 			request.MaxTokens = request.Thinking.BudgetTokens + 1
 		}

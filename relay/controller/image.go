@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math"
 	"mime/multipart"
 	"net/http"
 	"net/textproto"
@@ -228,6 +229,7 @@ func RelayImageHelper(c *gin.Context, relayMode int) *relaymodel.ErrorWithStatus
 	}
 
 	modelRatio := billingratio.GetModelRatio(imageModel, meta.ChannelType)
+	completionRatio := billingratio.GetCompletionRatio(imageModel, meta.ChannelType)
 	groupRatio := billingratio.GetGroupRatio(meta.Group)
 	ratio := modelRatio * groupRatio
 	userQuota, _ := model.CacheGetUserQuota(ctx, meta.UserId)
@@ -238,13 +240,8 @@ func RelayImageHelper(c *gin.Context, relayMode int) *relaymodel.ErrorWithStatus
 		// replicate always return 1 image
 		quota = int64(ratio * imageCostRatio * 1000)
 	default:
-		if imageRequest.Model == "gpt-image-1" {
-			quota = int64(ratio * imageCostRatio * 1000)
-		} else {
-			quota = int64(ratio*imageCostRatio*1000) * int64(imageRequest.N)
-		}
+		quota = int64(ratio*imageCostRatio*1000) * int64(imageRequest.N)
 	}
-	fmt.Println("quota", quota, "modelRatio", modelRatio, "groupRatio", groupRatio, "userQuota", userQuota, "quota", quota)
 
 	if userQuota-quota < 0 {
 		return openai.ErrorWrapper(errors.New("user quota is not enough"), "insufficient_user_quota", http.StatusForbidden)
@@ -342,6 +339,10 @@ func RelayImageHelper(c *gin.Context, relayMode int) *relaymodel.ErrorWithStatus
 			}
 			responseBodyContentBytes, _ := json.Marshal(imageResponse)
 			responseBodyContent = string(responseBodyContentBytes)
+			if imageRequest.Model == "gpt-image-1" {
+				logContent = fmt.Sprintf("模型倍率 %.2f，分组倍率 %.2f，倍率 %.2f", modelRatio, groupRatio, completionRatio)
+				quota = int64(math.Ceil((float64(promptTokens) + float64(completionTokens)*completionRatio) * ratio))
+			}
 
 			model.RecordOneConsumeLog(ctx, &model.Log{
 				UserId:            meta.UserId,
