@@ -50,6 +50,7 @@ var CompatibleChannels = []int{
 	channeltype.XAI,
 	channeltype.BaiduV2,
 	channeltype.XunfeiV2,
+	channeltype.AliBailian,
 }
 
 func GetCompatibleChannelMeta(channelType int) (string, []string) {

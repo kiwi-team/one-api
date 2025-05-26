@@ -230,7 +230,7 @@ func StreamHandler(c *gin.Context, resp *http.Response) (*model.ErrorWithStatusC
 }
 
 // qwq-32b 流式处理，最后返回一个完整的 response
-func StreamHandlerQwq32b(c *gin.Context, resp *http.Response) (*model.ErrorWithStatusCode, *model.Usage) {
+func StreamHandlerQwen(c *gin.Context, resp *http.Response, modelName string) (*model.ErrorWithStatusCode, *model.Usage) {
 	var usage model.Usage
 	scanner := bufio.NewScanner(resp.Body)
 	scanner.Split(func(data []byte, atEOF bool) (advance int, token []byte, err error) {
@@ -284,6 +284,7 @@ func StreamHandlerQwq32b(c *gin.Context, resp *http.Response) (*model.ErrorWithS
 		Id:      uuid.New().String(),
 		Object:  "chat.completion",
 		Created: helper.GetTimestamp(),
+		Model:   modelName,
 		Choices: []openai.TextResponseChoice{
 			{
 				Index: 0,
@@ -301,7 +302,6 @@ func StreamHandlerQwq32b(c *gin.Context, resp *http.Response) (*model.ErrorWithS
 			TotalTokens:      usage.TotalTokens,
 		},
 	}
-	fullTextResponse.Model = "qwq-32b"
 	jsonResponse, err := json.Marshal(fullTextResponse)
 	if err != nil {
 		return openai.ErrorWrapper(err, "marshal_response_body_failed", http.StatusInternalServerError), nil

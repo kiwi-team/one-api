@@ -28,4 +28,7 @@ var ModelList = []string{
 	"deepseek-r1", "deepseek-v3", "deepseek-r1-distill-qwen-1.5b", "deepseek-r1-distill-qwen-7b", "deepseek-r1-distill-qwen-14b", "deepseek-r1-distill-qwen-32b", "deepseek-r1-distill-llama-8b", "deepseek-r1-distill-llama-70b",
 }
 
-//"qwen-vl-max",
+// "qwen-vl-max",
+var StreamOnlyModelList = []string{
+	"qwq-32b",
+}

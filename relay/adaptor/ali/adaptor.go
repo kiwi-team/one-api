@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"slices"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -40,7 +41,8 @@ func (a *Adaptor) GetRequestURL(meta *meta.Meta) (string, error) {
 
 func (a *Adaptor) SetupRequestHeader(c *gin.Context, req *http.Request, meta *meta.Meta) error {
 	adaptor.SetupCommonRequestHeader(c, req, meta)
-	if meta.IsStream || strings.ToLower(meta.ActualModelName) == "qwq-32b" {
+	if meta.IsStream ||
+		slices.Contains(StreamOnlyModelList, strings.ToLower(meta.ActualModelName)) {
 		req.Header.Set("Accept", "text/event-stream")
 		req.Header.Set("X-DashScope-SSE", "enable")
 	}
@@ -94,8 +96,9 @@ func (a *Adaptor) DoResponse(c *gin.Context, resp *http.Response, meta *meta.Met
 		default:
 			// 对于 qwq-32b 模型，使用 StreamHandlerQwq32b 处理,这个模型，只能通过流式返回，
 			// 所以需要把流式返回的数据，转换为 openai 的非流式返回的数据
-			if strings.ToLower(meta.ActualModelName) == "qwq-32b" {
-				err, usage = StreamHandlerQwq32b(c, resp)
+			//if strings.ToLower(meta.ActualModelName) == "qwq-32b" {
+			if slices.Contains(StreamOnlyModelList, strings.ToLower(meta.ActualModelName)) {
+				err, usage = StreamHandlerQwen(c, resp, meta.ActualModelName)
 			} else {
 				err, usage = Handler(c, resp)
 			}

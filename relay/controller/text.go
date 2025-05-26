@@ -118,6 +118,7 @@ func getRequestBody(c *gin.Context, meta *meta.Meta, textRequest *model.GeneralO
 		// no need to convert request for openai
 		if meta.ChannelType != channeltype.Baidu2 &&
 			meta.ChannelType != channeltype.Aiguoguo &&
+			meta.ChannelType != channeltype.AliBailian &&
 			meta.ChannelType != channeltype.Panda &&
 			meta.ChannelType != channeltype.Doubao { // doubao stream 返回useage
 			return c.Request.Body, nil

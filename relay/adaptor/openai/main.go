@@ -10,6 +10,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
+	"github.com/google/uuid"
 	"github.com/songquanpeng/one-api/common/config"
 	"github.com/songquanpeng/one-api/common/contentcheck"
 	"github.com/songquanpeng/one-api/common/helper"
@@ -128,6 +129,92 @@ func StreamHandler(c *gin.Context, resp *http.Response, relayMode int) (*model.E
 	}
 
 	return nil, responseText, usage
+}
+
+// qwq-32b 流式处理，最后返回一个完整的 response
+func OnlyStreamModelHandler(c *gin.Context, resp *http.Response, modelName string) (*model.ErrorWithStatusCode, *model.Usage) {
+	var usage model.Usage
+	scanner := bufio.NewScanner(resp.Body)
+	scanner.Split(func(data []byte, atEOF bool) (advance int, token []byte, err error) {
+		if atEOF && len(data) == 0 {
+			return 0, nil, nil
+		}
+		if i := strings.Index(string(data), "\n"); i >= 0 {
+			return i + 1, data[0:i], nil
+		}
+		if atEOF {
+			return len(data), data, nil
+		}
+		return 0, nil, nil
+	})
+	content := ""
+	reason := ""
+
+	for scanner.Scan() {
+		data := scanner.Text()
+		if len(data) < 5 || data[:5] != "data:" {
+			continue
+		}
+		data = data[5:]
+
+		var streamResponse ChatCompletionsStreamResponse
+		err := json.Unmarshal([]byte(data), &streamResponse)
+		if err != nil {
+			logger.SysError("error unmarshalling stream response: " + err.Error())
+			continue
+		}
+		if streamResponse.Usage != nil && streamResponse.Usage.CompletionTokens != 0 {
+			usage.PromptTokens = streamResponse.Usage.PromptTokens
+			usage.CompletionTokens = streamResponse.Usage.CompletionTokens
+			usage.TotalTokens = streamResponse.Usage.TotalTokens
+			usage.CompletionTokensDetails = streamResponse.Usage.CompletionTokensDetails
+			usage.PromptTokensDetails = streamResponse.Usage.PromptTokensDetails
+		}
+		if len(streamResponse.Choices) > 0 {
+			if msgContent, ok := streamResponse.Choices[0].Delta.Content.(string); ok {
+				content += msgContent
+			}
+			if msgReason, ok := streamResponse.Choices[0].Delta.ReasoningContent.(string); ok {
+				reason += msgReason
+			}
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		logger.SysError("error reading stream: " + err.Error())
+	}
+
+	fullTextResponse := TextResponse{
+		Id:      uuid.New().String(),
+		Object:  "chat.completion",
+		Model:   modelName,
+		Created: helper.GetTimestamp(),
+		Choices: []TextResponseChoice{
+			{
+				Index: 0,
+				Message: model.Message{
+					Role:             "assistant",
+					Content:          content,
+					ReasoningContent: reason,
+				},
+				FinishReason: "stop",
+			},
+		},
+		Usage: model.Usage{
+			PromptTokens:     usage.PromptTokens,
+			CompletionTokens: usage.CompletionTokens,
+			TotalTokens:      usage.TotalTokens,
+		},
+	}
+	fullTextResponse.Model = modelName
+	jsonResponse, err := json.Marshal(fullTextResponse)
+	if err != nil {
+		return ErrorWrapper(err, "marshal_response_body_failed", http.StatusInternalServerError), nil
+	}
+	c.Writer.Header().Set("Content-Type", "application/json")
+	c.Writer.WriteHeader(resp.StatusCode)
+	c.Writer.Write(jsonResponse)
+	return nil, &usage
 }
 
 func contentCheck(preStr string, content string) (bool, string) {

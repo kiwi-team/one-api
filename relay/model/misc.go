@@ -18,6 +18,9 @@ type InputTokensDetails struct {
 type PromptTokensDetails struct {
 	CachedTokens int `json:"cached_tokens"`
 	AudioTokens  int `json:"audio_tokens"`
+	ImageTokens  int `json:"image_tokens"`
+	TextTokens   int `json:"text_tokens"`
+	VideoTokens  int `json:"video_tokens"`
 }
 type CompletionTokensDetails struct {
 	ReasoningTokens          int `json:"reasoning_tokens"`

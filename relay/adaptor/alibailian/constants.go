@@ -3,6 +3,13 @@ package alibailian
 // https://help.aliyun.com/zh/model-studio/getting-started/models
 
 var ModelList = []string{
+	"qwen2.5-omni-7b",
+	"qwq-32b",
+	"qwen-omni-turbo",
+	"qwen-omni-turbo-latest",
+	"qwen-omni-turbo-2025-03-26",
+	"qwen-omni-turbo-0326",
+	"qwen-omni-turbo-2025-01-19",
 	"qwen-turbo",
 	"qwen-plus",
 	"qwen-long",
@@ -17,4 +24,14 @@ var ModelList = []string{
 
 	"deepseek-r1",
 	"deepseek-v3",
+}
+
+var StreamOnlyModelList = []string{
+	"qwq-32b",
+	"qwen2.5-omni-7b",
+	"qwen-omni-turbo",
+	"qwen-omni-turbo-latest",
+	"qwen-omni-turbo-2025-03-26",
+	"qwen-omni-turbo-0326",
+	"qwen-omni-turbo-2025-01-19",
 }
