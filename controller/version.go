@@ -10,7 +10,7 @@ import (
 )
 
 func GetVersion(c *gin.Context) {
-	version := "v1.0.3"
+	version := "v1.0.5"
 	logger.Info(c, fmt.Sprintf("version %v ,time %v\n", version, time.Now()))
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
