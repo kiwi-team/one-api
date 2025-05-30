@@ -65,6 +65,7 @@ type GeneralOpenAIRequest struct {
 	NumCtx              int                `json:"num_ctx,omitempty"`
 	Thinking            *AnthropicThinking `json:"thinking,omitempty"`
 	Reasoning           *Reasoning         `json:"reasoning,omitempty"`
+	IncludeThinking     bool               `json:"include_thinking,omitempty"`
 	// https://platform.openai.com/docs/api-reference/chat/create
 	//Messages            []Message       `json:"messages,omitempty"`
 	//Model               string          `json:"model,omitempty"`

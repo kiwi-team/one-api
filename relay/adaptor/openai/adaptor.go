@@ -171,6 +171,9 @@ func (a *Adaptor) ConvertRequest(c *gin.Context, relayMode int, request *model.G
 			request.Messages = newMessages
 		}
 	}
+	if a.ChannelType == channeltype.Aiguoguo {
+		request.IncludeThinking = false // 响应体内容是否和思考内容合并, true则二者合并在content中, false或者不传则默认在
+	}
 	return request, nil
 }
 

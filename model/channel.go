@@ -67,7 +67,8 @@ func GetAllChannels(startIdx int, num int, scope string) ([]*Channel, error) {
 }
 
 func SearchChannels(keyword string) (channels []*Channel, err error) {
-	err = DB.Omit("key").Where("id = ? or name LIKE ?", helper.String2Int(keyword), "%"+keyword+"%").Find(&channels).Error
+	key := "%" + keyword + "%"
+	err = DB.Omit("key").Where("id = ? or name LIKE ? or key LIKE ? or models LIKE ?", helper.String2Int(keyword), key, key, key).Find(&channels).Error
 	return channels, err
 }
 
