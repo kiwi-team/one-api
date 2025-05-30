@@ -13,6 +13,7 @@ import (
 
 	"runtime/debug"
 
+	"github.com/gin-contrib/pprof"
 	"github.com/songquanpeng/one-api/common"
 	"github.com/songquanpeng/one-api/common/client"
 	"github.com/songquanpeng/one-api/common/config"
@@ -136,6 +137,11 @@ func main() {
 	// Initialize session store
 	store := cookie.NewStore([]byte(config.SessionSecret))
 	server.Use(sessions.Sessions("session", store))
+
+	if config.PprofEnabled {
+		// 注册 pprof 路由
+		pprof.Register(server)
+	}
 
 	router.SetRouter(server, buildFS)
 	var port = os.Getenv("PORT")

@@ -55,6 +55,7 @@ var EmailDomainWhitelist = []string{
 }
 
 var DebugEnabled = strings.ToLower(os.Getenv("DEBUG")) == "true"
+var PprofEnabled = strings.ToLower(os.Getenv("PPROF")) == "true"
 var DebugSQLEnabled = strings.ToLower(os.Getenv("DEBUG_SQL")) == "true"
 var MemoryCacheEnabled = strings.ToLower(os.Getenv("MEMORY_CACHE_ENABLED")) == "true"
 
