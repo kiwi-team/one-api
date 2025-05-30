@@ -24,7 +24,8 @@ type StreamOptions struct {
 type AnthropicThinking struct {
 	Type            string `json:"type,omitempty"`
 	BudgetTokens    int    `json:"budget_tokens,omitempty"`
-	IncludeThinking bool   `json:"include_thinking,omitempty"`
+	IncludeThinking bool   `json:"include_thinking,omitempty"` // 爱果果的参数
+	ThinkingBudget  int    `json:"thinking_budget,omitempty"`  // 爱果果的参数
 }
 
 // panda 的 reasoning 参数

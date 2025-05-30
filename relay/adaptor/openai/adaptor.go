@@ -172,7 +172,16 @@ func (a *Adaptor) ConvertRequest(c *gin.Context, relayMode int, request *model.G
 		}
 	}
 	if a.ChannelType == channeltype.Aiguoguo {
-		request.Thinking.IncludeThinking = false // 响应体内容是否和思考内容合并, true则二者合并在content中, false或者不传则默认在
+		if request.Thinking != nil {
+			request.Thinking.IncludeThinking = false // 响应体内容是否和思考内容合并, true则二者合并在content中, false或者不传则默认在
+		} else {
+			request.Thinking = &model.AnthropicThinking{
+				IncludeThinking: false,
+			}
+		}
+		if request.Thinking.BudgetTokens > 0 {
+			request.Thinking.ThinkingBudget = request.Thinking.BudgetTokens
+		}
 	}
 	return request, nil
 }
