@@ -61,16 +61,20 @@ func getAndValidateNewModelRequest(c *gin.Context, relayMode int) (*openai.ChatC
 	return textRequest, nil
 }
 
+// 直接返回0，避免计算prompt的token数量，避免计算时间，降低cpu的使用率
 func getPromptTokens(textRequest *relaymodel.GeneralOpenAIRequest, relayMode int) int {
-	switch relayMode {
-	case relaymode.ChatCompletions:
-		return openai.CountTokenMessages(textRequest.Messages, textRequest.Model)
-	case relaymode.Completions:
-		return openai.CountTokenInput(textRequest.Prompt, textRequest.Model)
-	case relaymode.Moderations:
-		return openai.CountTokenInput(textRequest.Input, textRequest.Model)
-	}
 	return 0
+	/*
+		switch relayMode {
+		case relaymode.ChatCompletions:
+			return openai.CountTokenMessages(textRequest.Messages, textRequest.Model)
+		case relaymode.Completions:
+			return openai.CountTokenInput(textRequest.Prompt, textRequest.Model)
+		case relaymode.Moderations:
+			return openai.CountTokenInput(textRequest.Input, textRequest.Model)
+		}
+		return 0
+	*/
 }
 
 func getPreConsumedQuota(textRequest *relaymodel.GeneralOpenAIRequest, promptTokens int, ratio float64) int64 {
