@@ -4,6 +4,7 @@ package geminiv2
 
 var ModelList = []string{
 	"gemini-2.5-pro-preview-06-05",
+	"gemini-2.5-pro-preview-05-06",
 	"gemini-2.5-pro-preview-03-25",
 	"gemini-pro", "gemini-1.0-pro",
 	// "gemma-2-2b-it", "gemma-2-9b-it", "gemma-2-27b-it",
