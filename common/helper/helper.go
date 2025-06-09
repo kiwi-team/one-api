@@ -147,6 +147,10 @@ func MessageWithRequestId(message string, id string) string {
 	// 如果出现panda，closeai，提示上游异常
 	if strings.Contains(message, "panda") {
 		message = "上游服务繁忙,请稍后再试"
+	} else if strings.Contains(message, "closeai") {
+		message = "上游服务繁忙,请稍后再试."
+	} else if strings.Contains(message, "guoguo") {
+		message = "上游服务繁忙,请稍后再试.."
 	}
 	return fmt.Sprintf("%s (request id: %s)", message, id)
 }
