@@ -113,10 +113,22 @@ type VideoURL struct {
 	Detail string `json:"detail,omitempty"`
 }
 
+type InputAudio struct {
+	Data   string `json:"data,omitempty"`
+	Format string `json:"format,omitempty"`
+}
+
+type InputVideo struct {
+	Data   string `json:"data,omitempty"`
+	Format string `json:"format,omitempty"`
+}
+
 type MessageContent struct {
-	Type     string    `json:"type,omitempty"`
-	Text     string    `json:"text"`
-	ImageURL *ImageURL `json:"image_url,omitempty"`
-	AudioURL *AudioURL `json:"audio_url,omitempty"`
-	VideoURL *VideoURL `json:"video_url,omitempty"`
+	Type       string      `json:"type,omitempty"`
+	Text       string      `json:"text"`
+	ImageURL   *ImageURL   `json:"image_url,omitempty"`
+	AudioURL   *AudioURL   `json:"audio_url,omitempty"`
+	VideoURL   *VideoURL   `json:"video_url,omitempty"`
+	InputAudio *InputAudio `json:"input_audio,omitempty"`
+	InputVideo *InputVideo `json:"input_video,omitempty"`
 }

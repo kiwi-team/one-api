@@ -65,5 +65,6 @@ const (
 	OpenAICompatible       // 61
 	GeminiOpenAICompatible // 62
 	Sensenova              // 63
-	Dummy                  // 64
+	Chataiapi              // 64
+	Dummy                  // 65
 )

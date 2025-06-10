@@ -120,6 +120,7 @@ func getRequestBody(c *gin.Context, meta *meta.Meta, textRequest *model.GeneralO
 			meta.ChannelType != channeltype.Aiguoguo &&
 			meta.ChannelType != channeltype.AliBailian &&
 			meta.ChannelType != channeltype.Panda &&
+			meta.ChannelType != channeltype.Chataiapi &&
 			meta.ChannelType != channeltype.Doubao { // doubao stream 返回useage
 			return c.Request.Body, nil
 		}
@@ -138,7 +139,9 @@ func getRequestBody(c *gin.Context, meta *meta.Meta, textRequest *model.GeneralO
 		logger.Debugf(c.Request.Context(), "converted request json_marshal_failed: %s\n", err.Error())
 		return nil, err
 	}
-	logger.Debugf(c.Request.Context(), "converted request: \n%s", string(jsonData))
+	if config.DebugEnabled {
+		logger.Debugf(c.Request.Context(), "converted request: \n%s", string(jsonData))
+	}
 	requestBody = bytes.NewBuffer(jsonData)
 	return requestBody, nil
 }

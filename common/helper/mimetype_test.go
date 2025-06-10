@@ -2,6 +2,7 @@ package helper
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 )
 
@@ -17,6 +18,7 @@ func TestDetectFileFromURL(t *testing.T) {
 
 func TestDetectFileAndBase64File(t *testing.T) {
 	url := "https://llmstatic.s3.cn-northwest-1.amazonaws.com.cn/e568dd8dce441eecc168bde02c261d50a/file-1739520908853efmpETW3eCfP.wav"
-	mime, base64Data, err := DetectFileAndBase64File(url)
-	fmt.Println(mime, base64Data, err)
+	mime, _, _ := DetectFileAndBase64File(url)
+	fmt.Println(strings.Trim(mime.Extension(), "."))
+	//fmt.Println(mime, base64Data, err)
 }

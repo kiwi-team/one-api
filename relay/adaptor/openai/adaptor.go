@@ -10,6 +10,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/songquanpeng/one-api/common/helper"
 	"github.com/songquanpeng/one-api/relay/adaptor"
 	"github.com/songquanpeng/one-api/relay/adaptor/alibailian"
 	"github.com/songquanpeng/one-api/relay/adaptor/baidu2"
@@ -157,6 +158,49 @@ func (a *Adaptor) ConvertRequest(c *gin.Context, relayMode int, request *model.G
 							Type: model.ContentTypeImageURL,
 							ImageURL: &model.ImageURL{
 								Url: content.VideoURL.Url,
+							},
+						}
+					default:
+						newContent = content
+					}
+					newContentArr = append(newContentArr, newContent)
+				}
+				newMessage := message
+				newMessage.Content = newContentArr
+				newMessages = append(newMessages, newMessage)
+			}
+			request.Messages = newMessages
+		} else if a.ChannelType == channeltype.Chataiapi {
+			// 把图片，音频，视频转化为base64
+			newMessages := make([]model.Message, 0, len(request.Messages))
+			for _, message := range request.Messages {
+				newContentArr := make([]model.MessageContent, 0)
+				arr := message.ParseContent()
+				for _, content := range arr {
+					var newContent model.MessageContent
+					switch content.Type {
+					case model.ContentTypeAudioURL:
+						mType, base64Data, err := helper.DetectFileAndBase64File(content.AudioURL.Url)
+						if err != nil {
+							return nil, err
+						}
+						newContent = model.MessageContent{
+							Type: model.ContentTypeInputAudio,
+							InputAudio: &model.InputAudio{
+								Data:   base64Data,
+								Format: strings.Trim(mType.Extension(), "."),
+							},
+						}
+					case model.ContentTypeVideoURL:
+						mType, base64Data, err := helper.DetectFileAndBase64File(content.VideoURL.Url)
+						if err != nil {
+							return nil, err
+						}
+						newContent = model.MessageContent{
+							Type: model.ContentTypeInputVideo,
+							InputVideo: &model.InputVideo{
+								Data:   base64Data,
+								Format: strings.Trim(mType.Extension(), "."),
 							},
 						}
 					default:

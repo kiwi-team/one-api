@@ -7,6 +7,7 @@ import (
 	"github.com/songquanpeng/one-api/relay/adaptor/baichuan"
 	"github.com/songquanpeng/one-api/relay/adaptor/baidu2"
 	"github.com/songquanpeng/one-api/relay/adaptor/baiduv2"
+	"github.com/songquanpeng/one-api/relay/adaptor/chataiapi"
 	"github.com/songquanpeng/one-api/relay/adaptor/deepseek"
 	"github.com/songquanpeng/one-api/relay/adaptor/doubao"
 	"github.com/songquanpeng/one-api/relay/adaptor/friday"
@@ -52,6 +53,7 @@ var CompatibleChannels = []int{
 	channeltype.XunfeiV2,
 	channeltype.AliBailian,
 	channeltype.GeminiOpenAICompatible,
+	channeltype.Chataiapi,
 }
 
 func GetCompatibleChannelMeta(channelType int) (string, []string) {
@@ -106,6 +108,8 @@ func GetCompatibleChannelMeta(channelType int) (string, []string) {
 		return "alibailian", alibailian.ModelList
 	case channeltype.GeminiOpenAICompatible:
 		return "geminiv2", geminiv2.ModelList
+	case channeltype.Chataiapi:
+		return "chataiapi", chataiapi.ModelList
 	default:
 		return "openai", ModelList
 	}

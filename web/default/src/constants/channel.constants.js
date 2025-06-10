@@ -106,6 +106,7 @@ export const CHANNEL_OPTIONS = [
   { key: 54, text: 'aiguoguo', value: 54, color: 'green' }, // ok
   { key: 55, text: 'baidu2', value: 55, color: 'blue' }, //ok
   { key: 63, text: 'Sensenova', value: 63, color: 'blue' }, //ok
+  { key: 64, text: 'Chataiapi', value: 64, color: 'green' }, //ok
   { key: 8, text: '自定义渠道', value: 8, color: 'pink' }, //ok
   { key: 22, text: '知识库：FastGPT', value: 22, color: 'blue' }, // ok
   { key: 21, text: '知识库：AI Proxy', value: 21, color: 'purple' }, //ok

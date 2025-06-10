@@ -66,6 +66,7 @@ var ChannelBaseURLs = []string{
 
 	"https://generativelanguage.googleapis.com/v1beta/openai/", // 51
 	"https://api.sensenova.cn",                                 // 52
+	"https://www.chataiapi.com",                                // 53
 }
 
 func init() {
