@@ -126,7 +126,7 @@ func Relay(c *gin.Context) {
 			bizErr.Error.Message = "当前分组上游负载已饱和，请稍后再试"
 		}
 
-		bizErr.Type = "toio-api-error"
+		bizErr.Type = "toio_api_error"
 
 		// BUG: bizErr is in race condition
 		bizErr.Error.Message = helper.MessageWithRequestId(bizErr.Error.Message, requestId)
@@ -169,7 +169,7 @@ func processChannelRelayError(ctx context.Context, userId int, channelId int, ch
 func RelayNotImplemented(c *gin.Context) {
 	err := model.Error{
 		Message: "API not implemented",
-		Type:    "one_api_error",
+		Type:    "toio_api_error",
 		Param:   "",
 		Code:    "api_not_implemented",
 	}
