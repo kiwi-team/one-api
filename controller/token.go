@@ -167,17 +167,18 @@ func AddToken(c *gin.Context) {
 	}
 
 	cleanToken := model.Token{
-		UserId:         c.GetInt(ctxkey.Id),
-		Name:           token.Name,
-		Key:            random.GenerateKey(),
-		CreatedTime:    helper.GetTimestamp(),
-		AccessedTime:   helper.GetTimestamp(),
-		ExpiredTime:    token.ExpiredTime,
-		RemainQuota:    token.RemainQuota,
-		UnlimitedQuota: token.UnlimitedQuota,
-		Models:         token.Models,
-		Subnet:         token.Subnet,
-		ChannelIds:     token.ChannelIds,
+		UserId:          c.GetInt(ctxkey.Id),
+		Name:            token.Name,
+		Key:             random.GenerateKey(),
+		CreatedTime:     helper.GetTimestamp(),
+		AccessedTime:    helper.GetTimestamp(),
+		ExpiredTime:     token.ExpiredTime,
+		RemainQuota:     token.RemainQuota,
+		UnlimitedQuota:  token.UnlimitedQuota,
+		Models:          token.Models,
+		Subnet:          token.Subnet,
+		ChannelIds:      token.ChannelIds,
+		ModelChannelMap: token.ModelChannelMap,
 	}
 	err = cleanToken.Insert()
 	if err != nil {
@@ -270,6 +271,9 @@ func UpdateToken(c *gin.Context) {
 		// channel_ids设置成0的时候，表示不更新渠道,aice那边，传递过来的channel_ids是0
 		if token.ChannelIds != nil && *token.ChannelIds != "0" {
 			cleanToken.ChannelIds = token.ChannelIds
+		}
+		if token.ModelChannelMap != nil {
+			cleanToken.ModelChannelMap = token.ModelChannelMap
 		}
 	}
 	err = cleanToken.Update()

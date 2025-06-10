@@ -22,6 +22,7 @@ const (
 	AvailableModels   = "available_models"
 	KeyRequestBody    = "key_request_body"
 	ChannelIds        = "channel_ids"
+	ModelChannelMap   = "model_channel_map" // 让某个key下的某个模型，可以指定渠道
 	SystemPrompt      = "system_prompt"
 	ModelRatioConfig  = "model_ratio_config"
 )
