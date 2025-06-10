@@ -145,9 +145,10 @@ func AssignOrDefault(value string, defaultValue string) string {
 func MessageWithRequestId(message string, id string) string {
 	// 对错误信息进行处理
 	// 如果出现panda，closeai，提示上游异常
+	message = strings.ToLower(message)
 	if strings.Contains(message, "panda") {
 		message = "上游服务繁忙,请稍后再试"
-	} else if strings.Contains(message, "closeai") {
+	} else if strings.Contains(message, "closeai") || strings.Contains(message, "openai-proxy") {
 		message = "上游服务繁忙,请稍后再试."
 	} else if strings.Contains(message, "guoguo") {
 		message = "上游服务繁忙,请稍后再试.."
