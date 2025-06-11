@@ -1,6 +1,7 @@
 package chataiapi
 
 var ModelList = []string{
+	"gpt-4-vision-preview",
 	"claude-opus-4-20250514",
 	"claude-sonnet-4-20250514",
 	"gemini-2.5-pro-preview-05-06",

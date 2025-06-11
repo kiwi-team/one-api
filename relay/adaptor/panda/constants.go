@@ -3,6 +3,7 @@ package panda
 // https://api.panda-v.com/pricing
 
 var ModelList = []string{
+	"gpt-4-vision-preview",
 	"gemini-2.5-flash-preview-thinking",
 	"gemini-2.5-flash-preview-non-thinking",
 	"claude-opus-4-20250514",
