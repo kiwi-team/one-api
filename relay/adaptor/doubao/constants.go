@@ -3,6 +3,9 @@ package doubao
 // https://console.volcengine.com/ark/region:ark+cn-beijing/model
 
 var ModelList = []string{
+	"doubao-seed-1-6-250615",
+	"doubao-seed-1-6-flash-250615",
+	"doubao-seed-1-6-thinking-250615",
 	"deepseek-v3-250324",
 	"deepseek-r1-250120",
 	"doubao-1-5-vision-lite-250315",
