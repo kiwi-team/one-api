@@ -123,6 +123,10 @@ func (a *Adaptor) ConvertRequest(c *gin.Context, relayMode int, request *model.G
 			request.MaxTokens = request.Thinking.BudgetTokens + 1
 		}
 	}
+	// 走chataiapi的渠道
+	if a.ChannelType == channeltype.Chataiapi && strings.HasPrefix(request.Model, "claude-") && request.Thinking != nil && request.Thinking.Type == "enabled" {
+		request.Model = request.Model + "-thinking"
+	}
 	// 走panda的渠道， gemini-2.5-flash-preview-04-17 开启 thinking 要按照panda的格式来传参数
 	if a.ChannelType == channeltype.Panda && strings.HasPrefix(request.Model, "gemini-2.5-flash-preview-04-17") && request.Thinking != nil {
 		if request.Thinking.Type == "enabled" && request.Thinking.BudgetTokens >= 0 {

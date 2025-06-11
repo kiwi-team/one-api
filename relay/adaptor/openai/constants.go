@@ -1,6 +1,7 @@
 package openai
 
 var ModelList = []string{
+	"o3-pro",
 	"o3",
 	"o4-mini",
 	"o4-mini-2025-04-16",
