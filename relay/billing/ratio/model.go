@@ -737,6 +737,18 @@ func GetModelRatio(name string, channelType int) float64 {
 	if ratio, ok := ModelRatio[model]; ok {
 		return ratio
 	}
+	removeThinkingName := strings.Trim(name, "-thinking")
+	if ratio, ok := ModelRatio[removeThinkingName]; ok {
+		return ratio
+	}
+	removeThinkingName = strings.Trim(name, "-nothinking")
+	if ratio, ok := ModelRatio[removeThinkingName]; ok {
+		return ratio
+	}
+	removeThinkingName = strings.Trim(name, "#thinking")
+	if ratio, ok := ModelRatio[removeThinkingName]; ok {
+		return ratio
+	}
 	if ratio, ok := DefaultModelRatio[model]; ok {
 		return ratio
 	}
@@ -792,6 +804,18 @@ func GetCompletionRatio(name string, channelType int) float64 {
 		return ratio
 	}
 	if ratio, ok := CompletionRatio[name]; ok {
+		return ratio
+	}
+	removeThinkingName := strings.Trim(name, "-thinking")
+	if ratio, ok := CompletionRatio[removeThinkingName]; ok {
+		return ratio
+	}
+	removeThinkingName = strings.Trim(name, "#thinking")
+	if ratio, ok := CompletionRatio[removeThinkingName]; ok {
+		return ratio
+	}
+	removeThinkingName = strings.Trim(name, "-nothinking")
+	if ratio, ok := CompletionRatio[removeThinkingName]; ok {
 		return ratio
 	}
 	if ratio, ok := DefaultCompletionRatio[name]; ok {
