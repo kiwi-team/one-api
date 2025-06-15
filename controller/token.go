@@ -150,6 +150,10 @@ func validateToken(c *gin.Context, token model.Token) error {
 func AddToken(c *gin.Context) {
 	token := model.Token{}
 	err := c.ShouldBindJSON(&token)
+	if token.ModelRatioConfig == "" {
+		token.ModelRatioConfig = "[]"
+	}
+	fmt.Printf("token %+v\n", token)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
@@ -167,18 +171,19 @@ func AddToken(c *gin.Context) {
 	}
 
 	cleanToken := model.Token{
-		UserId:          c.GetInt(ctxkey.Id),
-		Name:            token.Name,
-		Key:             random.GenerateKey(),
-		CreatedTime:     helper.GetTimestamp(),
-		AccessedTime:    helper.GetTimestamp(),
-		ExpiredTime:     token.ExpiredTime,
-		RemainQuota:     token.RemainQuota,
-		UnlimitedQuota:  token.UnlimitedQuota,
-		Models:          token.Models,
-		Subnet:          token.Subnet,
-		ChannelIds:      token.ChannelIds,
-		ModelChannelMap: token.ModelChannelMap,
+		UserId:           c.GetInt(ctxkey.Id),
+		Name:             token.Name,
+		Key:              random.GenerateKey(),
+		CreatedTime:      helper.GetTimestamp(),
+		AccessedTime:     helper.GetTimestamp(),
+		ExpiredTime:      token.ExpiredTime,
+		RemainQuota:      token.RemainQuota,
+		UnlimitedQuota:   token.UnlimitedQuota,
+		Models:           token.Models,
+		Subnet:           token.Subnet,
+		ChannelIds:       token.ChannelIds,
+		ModelChannelMap:  token.ModelChannelMap,
+		ModelRatioConfig: token.ModelRatioConfig,
 	}
 	err = cleanToken.Insert()
 	if err != nil {
