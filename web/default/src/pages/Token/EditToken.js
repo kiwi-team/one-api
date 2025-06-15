@@ -44,7 +44,7 @@ const EditToken = () => {
     models: [],
     subnet: "",
     channel_ids:"",
-    model_ratio_config: [],
+    model_ratio_config: "[]",
   };
   const [inputs, setInputs] = useState(originInputs);
   const { name, remain_quota, expired_time, unlimited_quota,channel_ids,model_ratio_config } = inputs;
