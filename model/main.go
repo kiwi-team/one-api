@@ -239,8 +239,8 @@ func setDBConns(db *gorm.DB) *sql.DB {
 		return nil
 	}
 
-	sqlDB.SetMaxIdleConns(env.Int("SQL_MAX_IDLE_CONNS", 100))
-	sqlDB.SetMaxOpenConns(env.Int("SQL_MAX_OPEN_CONNS", 1000))
+	sqlDB.SetMaxIdleConns(env.Int("SQL_MAX_IDLE_CONNS", 20))  // aws postgresql m5.large 推荐
+	sqlDB.SetMaxOpenConns(env.Int("SQL_MAX_OPEN_CONNS", 100)) //  aws postgresql m5.large 推荐
 	sqlDB.SetConnMaxLifetime(time.Second * time.Duration(env.Int("SQL_MAX_LIFETIME", 60)))
 	return sqlDB
 }
