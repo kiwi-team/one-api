@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"regexp"
@@ -13,6 +14,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/songquanpeng/one-api/common/config"
 	"github.com/songquanpeng/one-api/common/contentcheck"
+	"github.com/songquanpeng/one-api/common/ctxkey"
 	"github.com/songquanpeng/one-api/common/helper"
 	"github.com/songquanpeng/one-api/common/render"
 
@@ -283,24 +285,6 @@ func Handler(c *gin.Context, resp *http.Response, promptTokens int, modelName st
 	} else {
 		resp.Body = io.NopCloser(bytes.NewBuffer(responseBody))
 	}
-
-	// We shouldn't set the header before we parse the response body, because the parse part may fail.
-	// And then we will have to send an error response, but in this case, the header has already been set.
-	// So the HTTPClient will be confused by the response.
-	// For example, Postman will report error, and we cannot check the response at all.
-	for k, v := range resp.Header {
-		c.Writer.Header().Set(k, v[0])
-	}
-	c.Writer.WriteHeader(resp.StatusCode)
-	_, err = io.Copy(c.Writer, resp.Body)
-	if err != nil {
-		return ErrorWrapper(err, "copy_response_body_failed", http.StatusInternalServerError), nil
-	}
-	err = resp.Body.Close()
-	if err != nil {
-		return ErrorWrapper(err, "close_response_body_failed", http.StatusInternalServerError), nil
-	}
-
 	if textResponse.Usage.TotalTokens == 0 || (textResponse.Usage.PromptTokens == 0 && textResponse.Usage.CompletionTokens == 0 && textResponse.Usage.InputTokens == 0 && textResponse.Usage.OutputTokens == 0) {
 		completionTokens := 0
 		for _, choice := range textResponse.Choices {
@@ -312,5 +296,28 @@ func Handler(c *gin.Context, resp *http.Response, promptTokens int, modelName st
 			TotalTokens:      promptTokens + completionTokens,
 		}
 	}
+
+	// We shouldn't set the header before we parse the response body, because the parse part may fail.
+	// And then we will have to send an error response, but in this case, the header has already been set.
+	// So the HTTPClient will be confused by the response.
+	// For example, Postman will report error, and we cannot check the response at all.
+	for k, v := range resp.Header {
+		c.Writer.Header().Set(k, v[0])
+	}
+	c.Writer.WriteHeader(resp.StatusCode)
+	_, err = io.Copy(c.Writer, resp.Body)
+	if err != nil {
+		if strings.Contains(err.Error(), "broken pipe") {
+			channelName := c.GetString(ctxkey.ChannelName)
+			logger.SysError(fmt.Sprintf("client closed connection channel:%s  model:%s", channelName, modelName))
+			return nil, &textResponse.Usage
+		}
+		return ErrorWrapper(err, "copy_response_body_failed", http.StatusInternalServerError), nil
+	}
+	err = resp.Body.Close()
+	if err != nil {
+		return ErrorWrapper(err, "close_response_body_failed", http.StatusInternalServerError), nil
+	}
+
 	return nil, &textResponse.Usage
 }
