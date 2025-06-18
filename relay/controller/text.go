@@ -128,6 +128,10 @@ func getRequestBody(c *gin.Context, meta *meta.Meta, textRequest *model.GeneralO
 
 	// get request body
 	var requestBody io.Reader
+	if meta.ChannelType == channeltype.Azure {
+		// o系列模型不支持Temperature
+		textRequest.Temperature = nil
+	}
 
 	convertedRequest, err := adaptor.ConvertRequest(c, meta.Mode, textRequest)
 	if err != nil {

@@ -236,8 +236,6 @@ func (a *Adaptor) ConvertRequest(c *gin.Context, relayMode int, request *model.G
 	if strings.Contains(request.Model, "o3") ||
 		strings.Contains(request.Model, "o4") ||
 		strings.Contains(request.Model, "o1") {
-		// o系列模型不支持Temperature
-		request.Temperature = nil
 		// 去掉TopK这个参数
 		request.TopK = 0
 	}
