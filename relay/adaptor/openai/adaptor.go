@@ -231,6 +231,8 @@ func (a *Adaptor) ConvertRequest(c *gin.Context, relayMode int, request *model.G
 			request.Thinking.ThinkingBudget = request.Thinking.BudgetTokens
 		}
 	}
+	// 去掉TopK这个参数
+	request.TopK = 0
 	return request, nil
 }
 
